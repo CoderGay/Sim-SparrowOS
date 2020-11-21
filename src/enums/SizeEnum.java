@@ -4,7 +4,10 @@ package enums;
  * Create By  @林俊杰
  * 2020/10/26 21:19
  *
- * @version 1.0
+ * Modify By @WenZhikun
+ * 2020/11/21 10:00
+ *
+ * @version 1.1
  */
 public enum SizeEnum {
 
@@ -17,6 +20,15 @@ public enum SizeEnum {
     USER_MEMORY_SIZE(512,"内存用户区空间共有512B"),
 
     ALLOCATE_TABLE_MEMORY_SIZE(64,"内存分配表占用空间64B"),
+
+    DISK_SIZE(256,"磁盘大小"),
+
+    BLOCKS_SIZE(64,"盘块大小"),
+
+    AVALIABLE_BLOCKS(0,"可用盘块标志"),
+
+    END_BLOCKS_LABEL(-1,"文件结束标志"),
+
 
     ;
 
