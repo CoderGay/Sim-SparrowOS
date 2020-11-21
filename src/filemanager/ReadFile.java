@@ -7,4 +7,13 @@ package filemanager;
 public class ReadFile {
     //读文件操作
     //TODO read file
+    public static FileCatalog read(String fileName){
+        //
+        FileCatalog fileCatalog = null;
+        String []dirs = fileName.split("\\\\");
+
+        return fileCatalog;
+    }
+
+
 }

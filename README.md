@@ -17,4 +17,5 @@ OS Simulation Program
     在filemanage包创建文件管理有关类
     在Disk类中实现磁盘初始化、盘块申请、盘块回收、修改指定盘块内容
     完善文件目录类
+    修改部分bug,读取文件有待完善.
     

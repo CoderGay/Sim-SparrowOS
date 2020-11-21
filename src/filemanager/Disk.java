@@ -87,11 +87,11 @@ public class Disk {
     }
 
     //文件盘块回收，文件删除后回收全部盘块
-    public boolean fileRecycling(FileCatalog fileCatalog){
+    public FileCatalog fileRecycling(FileCatalog fileCatalog){
 
         if (fileAllocateTable[fileCatalog.getStartIndex()]==0){
             //TODO 抛出异常
-            return false;
+            return null;
         }
         int count = 0,temp = fileCatalog.getStartIndex() , label;
         while (fileAllocateTable[temp]!=SizeEnum.END_BLOCKS_LABEL.getCode()){
@@ -103,13 +103,14 @@ public class Disk {
         fileAllocateTable[temp] = SizeEnum.AVALIABLE_BLOCKS.getCode();
         count++;
         availableBlocks+=count;
-        return true;
+        return fileCatalog;
     }
 
     //对指定盘块的内容进行修改
     public boolean writeDisk(int blockIndex,String message){
         //一个字符占一个字节，一个盘块有64字节，写入超过64字节则出错
         if (message.length()>64){
+            //TODO 此处建议抛异常!
             System.out.println("file writing error !");
             return false;
         }
@@ -124,6 +125,7 @@ public class Disk {
                 }else{
                     str+=bufferedReader.readLine()+"\n";
                 }
+                i++;
             }
             bufferedReader.close();
         }catch (IOException e){
