@@ -1,12 +1,9 @@
 package filemanager;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+import enums.FileTypeEnum;
 import enums.SizeEnum;
 
-import javax.swing.*;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author WenZhikun
@@ -14,7 +11,8 @@ import java.util.List;
  */
 public class Disk {
     //磁盘，共有256盘快，每盘快大小为64B
-    //采用链式分配方式，文件分配表每个项占1B，共128B，占用前4个盘快(0,1,2,3)
+    //采用链式分配方式，文件分配表每个项占1B，共256B，占用前4个盘快(0,1,2,3)
+    //根目录 占用64B, 共占用一个盘块(4);
 
     //文件分配表（链式分配中盘块索引）,长度256
     //-1表示为文件最后一块，0代表可分配，其它代表已占用
@@ -26,38 +24,118 @@ public class Disk {
     //可用盘块个数
     private int availableBlocks;
 
+    //根目录 为目录文件和系统文件 在盘块4中
+    private FileCatalog root;
+
+    private String diskName;
+
     //设计成单例模式
     private static Disk disk = null;
 
     private Disk(){
         //初始化文件分配表和盘块
-        for (int i = 0; i< SizeEnum.DISK_SIZE.getCode(); i++){
-            if (i<2){
-                //文件分配表占用
-                fileAllocateTable[i] = SizeEnum.END_BLOCKS_LABEL.getCode();
-                //开头两个盘块不给使用
-                blocksStatus[i] = 0;
-            }else{
-                fileAllocateTable[i] = SizeEnum.AVALIABLE_BLOCKS.getCode();
-                blocksStatus[i] = SizeEnum.BLOCKS_SIZE.getCode();
-            }
-        }
+        root = new FileCatalog("", FileTypeEnum.DIR_LABEL.getCode(),1010,4,SizeEnum.BLOCKS_SIZE.getCode());
+
         //使用disk.txt作为磁盘文件
         try{
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("disk.txt"));
-            //写满256行
-            for (int i = 0; i < 256; i++) {
-                bufferedWriter.write("\n");
+            diskName = System.getProperty("user.dir")+"/resource"+"/disk.txt";
+            String diskContent = getDiskDocumentContent(1, 4);
+            String[] strings = diskContent.split("\n");
+
+            for (int i = 0; i <SizeEnum.DISK_SIZE.getCode(); i++) {
+                fileAllocateTable[i] = Integer.parseInt(strings[i/64].split(",")[i%64]);
             }
-            bufferedWriter.flush();
-            bufferedWriter.close();
-        }catch (IOException e){
+        }catch (java.io.FileNotFoundException e){
+
+            for (int i = 0; i< SizeEnum.DISK_SIZE.getCode(); i++){
+                if (i<5){
+                    //文件分配表占用
+                    fileAllocateTable[i] = SizeEnum.END_BLOCKS_LABEL.getCode();
+                    //开头五个盘块(文件分配表占用4个+根目录占用1个)不给使用
+                    blocksStatus[i] = 0;
+                }else{
+                    fileAllocateTable[i] = SizeEnum.AVALIABLE_BLOCKS.getCode();
+                    blocksStatus[i] = SizeEnum.BLOCKS_SIZE.getCode();
+                }
+            }
+
+
+            try {
+                File diskFile = new File(diskName.split("/")[1]);
+                diskFile.mkdirs();
+                //写满256行
+                StringBuilder tStrBuilder = new StringBuilder();
+                for (int i = 0; i < 256; i++) {
+                    if (i<1){
+                        for (int j = 0; j < 64; j++) {
+                            if(j<5)
+                                tStrBuilder.append(-1);
+                            else
+                                tStrBuilder.append(0);
+                            if (j!=64-1)
+                                tStrBuilder.append(",");
+                        }
+                        tStrBuilder.append("\n");
+                    }else if (i<4){
+                        for (int j = 0; j < 64; j++) {
+                            tStrBuilder.append(0);
+                            if (j!=64-1)
+                                tStrBuilder.append(",");
+                        }
+                        tStrBuilder.append("\n");
+                    }
+//                    tStrBuilder.append("\n");
+                }
+                setDiskDocumentContent(tStrBuilder.toString());
+            }catch (IOException e1){
+                System.out.println(e1);
+            }finally {
+                System.out.println(e.toString());
+            }
+
+        }
+        catch (IOException e){
             System.out.println(e.toString());
         }
 
         //初始化可用盘块
-        availableBlocks = SizeEnum.DISK_SIZE.getCode() - 4;
+        availableBlocks = SizeEnum.DISK_SIZE.getCode() - 5;
     }
+
+    //读取磁盘文件内容
+    // !!!action!!!: This method just read the "disk.txt" content! It isn't read the sim-OS's content of disk @Lin JunJie
+    private String getDiskDocumentContent(int startIndex, int length) throws IOException {
+        FileInputStream fis = new FileInputStream(diskName);
+        InputStreamReader reader = new InputStreamReader(fis,"utf-8"); //最后的"UTF-8"根据文件属性而定，如果不行，改成"GBK"试试
+        BufferedReader br = new BufferedReader(reader);
+        String line;
+        int count = 1;
+        StringBuilder sBuilder = new StringBuilder();
+        while ((line = br.readLine()) != null) {
+            if(count >= startIndex && count < startIndex+length){
+                sBuilder.append(line);
+                if (length>1)
+                sBuilder.append("\n");
+            }
+            count++;
+            //System.out.println(sBuilder);
+        }
+        br.close();
+        reader.close();
+        return sBuilder.toString();
+    }
+
+    //写入磁盘文件内容
+    // !!!action!!!: This method just write the whole "disk.txt" content! It isn't write the sim-OS's content of disk @Lin JunJie
+    private void setDiskDocumentContent(String wholeDiskFileContent) throws IOException {
+        FileOutputStream fos = new FileOutputStream(diskName);
+        OutputStreamWriter writer = new OutputStreamWriter(fos,"utf-8");
+        BufferedWriter bw = new BufferedWriter(writer);
+        bw.write(wholeDiskFileContent);
+        bw.flush();//冲走。意思是把缓冲区的内容强制的写出。
+        bw.close();
+    }
+
 
     //文件盘块申请,一次申请一块
     public boolean fileAllocate(FileCatalog fileCatalog){
@@ -117,7 +195,7 @@ public class Disk {
         String str = "";
         //先对文件内容读入缓冲区，并进行修改
         try{
-            BufferedReader bufferedReader = new BufferedReader(new FileReader("disk.txt"));
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(diskName));
             int i=0;
             while (bufferedReader.ready()){
                 if (i==blockIndex){
@@ -129,11 +207,11 @@ public class Disk {
             }
             bufferedReader.close();
         }catch (IOException e){
-            System.out.println(e.toString());
+            System.out.println(e.toString()+"------------>请检查：Disk()是否已经初始化,即diskName成员属性可能为空");
         }
         //将修改过后的文件disk内容写回去disk.txt
         try{
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("disk.txt"));
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(diskName));
             bufferedWriter.write(str);
             bufferedWriter.flush();
             bufferedWriter.close();
@@ -141,6 +219,26 @@ public class Disk {
             System.out.println(e.toString());
         }
         return true;
+    }
+
+    //读取某个盘块内容
+    public String getDiskBlockContent(FileCatalog fileCatalog){
+        StringBuilder strBuilder = new StringBuilder();
+
+        int nextBlock  = fileCatalog.getStartIndex();
+        int index = 0;
+        fileCatalog.setReadPointBlock(nextBlock);
+        fileCatalog.setReadPointIndex(index);
+
+        try {
+            while(nextBlock!=-1&&nextBlock<SizeEnum.DISK_SIZE.getCode()){
+                strBuilder.append(getDiskDocumentContent(nextBlock+1,1));
+                nextBlock  = fileAllocateTable[nextBlock];
+            }
+        } catch (IOException e) {
+            System.out.println("------>[Error]: 硬盘损坏!"+e.getMessage());
+        }
+        return strBuilder.toString();
     }
 
     /**
@@ -163,5 +261,9 @@ public class Disk {
 
     public int getAvailableBlocks() {
         return availableBlocks;
+    }
+
+    public FileCatalog getRoot() {
+        return root;
     }
 }

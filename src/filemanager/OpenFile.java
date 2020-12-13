@@ -30,11 +30,11 @@ public class OpenFile {
     public boolean openAFile(String fileName,int operationType){
         //if (openedFileList.contains())
         //TODO 检索所有文件表是否有该文件名的文件存在
+        String []dirs = fileName.split("\\\\");
+            //TODO 1.以相对路径为文件名检索是否存在
 
-            //TODO 1.以绝对路径为文件名检索是否存在
 
-
-            //TODO 2.以相对路径为文件名检索是否存在
+            //TODO 2.以绝对路径为文件名检索是否存在
 
         /**
          * 方案一：构建局部文件树(即当前目录为根节点)，检索文件树形目录结构
