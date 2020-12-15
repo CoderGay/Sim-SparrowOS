@@ -1,17 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import java.lang.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
 
-<AnchorPane fx:id="parent" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="run.Controller">
+<AnchorPane fx:id="parent" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="run.Controller">
    <children>
       <ImageView fx:id="desktop_wallpaper" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../resource/icon/wallhaven-test1.jpg" />
          </image></ImageView>
-      <HBox layoutX="280.0" prefHeight="31.0" prefWidth="720.0" />
       <Pane fx:id="desktop_pane" onContextMenuRequested="#desktop_right_click" prefHeight="720.0" prefWidth="1286.0" />
+      <Label prefHeight="709.0" prefWidth="1280.0">
+         <contextMenu>
+            <ContextMenu>
+               <items>
+                  <MenuItem mnemonicParsing="false" text="复制" />
+                  <MenuItem mnemonicParsing="false" text="粘贴" />
+                  <MenuItem mnemonicParsing="false" text="新建" />
+                  <MenuItem fx:id="menuItem_change_desktop_wallpaper" mnemonicParsing="false" onAction="#changeDesktopWallpaper" text="更换壁纸" />
+               </items>
+            </ContextMenu>
+         </contextMenu>
+      </Label>
    </children>
 </AnchorPane>

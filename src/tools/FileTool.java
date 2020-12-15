@@ -1,9 +1,10 @@
 package tools;
 
-import enums.DiskLabelEnum;
 import filemanager.CurrentDirCatalog;
-import filemanager.Disk;
+import equipment.Disk;
 import filemanager.FileCatalog;
+
+import java.io.*;
 
 /**
  * Create By  @林俊杰
@@ -11,9 +12,9 @@ import filemanager.FileCatalog;
  *
  * @version 1.0
  */
-public class FileNameTool {
+public class FileTool {
 
-    //TODO disk文件中最好使用对象流!
+
 
     public static boolean isExist(String fileName){
         String []dirs = fileName.split("/");
@@ -39,7 +40,7 @@ public class FileNameTool {
             return true;
         }else if(dirs[0].equals("")) {  //空字符串代表它在根目录下
             //TODO 2.以绝对路径为文件名检索是否存在
-            boolean yes = hasAbsolutePath(fileName);
+            /*boolean yes = hasAbsolutePath(fileName);*/
 
             System.out.println("绝对路径");
            return true;
@@ -49,7 +50,7 @@ public class FileNameTool {
     }
 
     //TODO: 此处需要递归
-    private static boolean hasAbsolutePath(String absolutePath){
+    /*private static boolean hasAbsolutePath(String absolutePath){
 
         Disk disk = Disk.getDisk();
         String []dirs = absolutePath.split("/");
@@ -74,6 +75,32 @@ public class FileNameTool {
         }
 
         return false;
+    }*/
+
+    public static void writeObjectStreamFile(Object object,String filename){
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename))) {
+            oos.writeObject(object);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Object readObjectStreamFile(String filename)throws FileNotFoundException{
+        Object object= null;
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename))) {
+            object = ois.readObject();
+        }catch (FileNotFoundException e) {
+            throw  e;
+        }finally{
+            return object;
+        }
+    }
+
+    public static boolean isDiskFileExist(String filename){
+        File file = new File(filename);
+        return file.exists();
     }
 
 }

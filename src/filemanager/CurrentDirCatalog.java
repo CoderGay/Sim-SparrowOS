@@ -1,5 +1,7 @@
 package filemanager;
 
+import equipment.Disk;
+
 /**
  * @author WenZhikun
  * @data 2020-11-21 15:10

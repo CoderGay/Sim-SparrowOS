@@ -6,7 +6,7 @@ package enums;
  *
  * @version 1.0
  */
-public enum BlockReasonEnum {
+public enum BlockingReasonEnum {
     //待补充
     NON_BLOCK(0,"没有被阻塞"),
     ;
@@ -16,7 +16,7 @@ public enum BlockReasonEnum {
 
     private String message;
 
-    BlockReasonEnum(Integer code, String message) {
+    BlockingReasonEnum(Integer code, String message) {
         this.code = code;
         this.message = message;
     }

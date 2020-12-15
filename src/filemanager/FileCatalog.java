@@ -3,13 +3,14 @@ package filemanager;
 import enums.FileTypeEnum;
 
 import javax.print.DocFlavor;
+import java.io.Serializable;
 
 /**
  * @author WenZhikun
  * @modified 林俊杰 , 2020-12-13 11:23
  * @data 2020-11-21 10:31
  */
-public class FileCatalog {
+public class FileCatalog implements Serializable {
     //文件目录结构,占8B
     //TODO 建议修改类名!(FileCatalogNode) 窃以为,此类应称为"目录项比较合适",根据课设指导书文件中(Page 19,Line 8~9)指出："文件目录由若干目录项组成，每一个目录记录一个文件的有关信息。"
 

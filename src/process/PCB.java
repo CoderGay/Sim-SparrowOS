@@ -1,11 +1,10 @@
 package process;
 
-import enums.BlockReasonEnum;
+import enums.BlockingReasonEnum;
 import enums.ProcessStatusEnum;
 import enums.SizeEnum;
 
 import java.util.Random;
-import java.util.UUID;
 
 /**
  * Create By  @林俊杰
@@ -42,7 +41,7 @@ public class PCB {
 
         status = ProcessStatusEnum.NEW.getCode();
 
-        blockReason = BlockReasonEnum.NON_BLOCK.getCode();
+        blockReason = BlockingReasonEnum.NON_BLOCK.getCode();
 
         time = needTime;
 

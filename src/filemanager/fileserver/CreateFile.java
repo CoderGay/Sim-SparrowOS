@@ -1,6 +1,5 @@
 package filemanager.fileserver;
 
-import filemanager.Disk;
 import filemanager.FileServer;
 
 /**

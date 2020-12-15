@@ -1,11 +1,10 @@
-package filemanager;
+package equipment;
 
+import equipment.Disk;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Create By  @林俊杰
@@ -18,6 +17,9 @@ class DiskTest {
     @Test
     void getDiskDocumentContent() throws IOException {
         Disk disk = Disk.getDisk();
+
+        //FileTool.writeObjectStreamFile(disk,"myTest.disk");
         Assert.assertNotEquals(disk,null);
+
     }
 }
