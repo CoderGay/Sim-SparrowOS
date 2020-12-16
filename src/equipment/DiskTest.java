@@ -17,7 +17,12 @@ class DiskTest {
     @Test
     void getDiskDocumentContent() throws IOException {
         Disk disk = Disk.getDisk();
-
+        System.out.println(disk.getRoot().getCatalogName());
+        System.out.println(disk.getAvailableBlocks());
+        for (int a:disk.getFileAllocateTable()
+             ) {
+            System.out.print(a+" ");
+        }
         //FileTool.writeObjectStreamFile(disk,"myTest.disk");
         Assert.assertNotEquals(disk,null);
 

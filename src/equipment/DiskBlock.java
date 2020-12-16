@@ -1,12 +1,14 @@
 package equipment;
 
+import java.io.Serializable;
+
 /**
  * Create By  @林俊杰
  * 2020/12/15 19:58
  *
  * @version 1.0
  */
-public class DiskBlock<T> {
+public class DiskBlock<T> implements Serializable {
     private T data;
     private boolean isAvailable;
     private int occupiedSize;

@@ -33,7 +33,7 @@ public class Disk implements Serializable,Device{
 
     private static String diskName;
 
-    private List<DiskBlock> diskBlockList;
+    private List<DiskBlock> diskBlockList=new ArrayList<>();
 
     //设计成单例模式
     private static Disk disk = null;
@@ -50,7 +50,9 @@ public class Disk implements Serializable,Device{
         //使用disk.txt作为磁盘文件
         try{
             diskName = System.getProperty("user.dir")+"/resource"+"/Sparrow.disk";
-            disk = getDiskDocument();
+            if(!FileTool.isDiskFileExist(diskName)){
+                throw new FileNotFoundException();
+            }
         }catch (java.io.FileNotFoundException e){
 
             /**
@@ -75,7 +77,7 @@ public class Disk implements Serializable,Device{
                 File diskFile = new File(diskName.split("/")[1]);
                 diskFile.mkdirs();
 
-                diskBlockList = new ArrayList<>();
+//                diskBlockList = new ArrayList<>();
                 //写满256行
                 for (int i = 0; i < SizeEnum.DISK_SIZE.getCode(); i++) {
                     /**
@@ -101,17 +103,18 @@ public class Disk implements Serializable,Device{
     }
 
     //读取磁盘文件内容
-    private Disk getDiskDocument() throws FileNotFoundException {
+    private static Disk getDiskDocument(){
+        Disk disk =null;
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(diskName))) {
-             return (Disk) ois.readObject();
+            disk = (Disk) ois.readObject();
         }catch (FileNotFoundException e) {
-            throw  e;
+            System.out.println(e.getMessage());
         }catch (ClassNotFoundException e){
             System.out.println(e.getMessage());
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-        return null;
+        return disk;
     }
 
     //写入磁盘文件内容
@@ -239,6 +242,8 @@ public class Disk implements Serializable,Device{
             if (!FileTool.isDiskFileExist(diskName)){
                 output2DiskDocument(disk);//写入Disk文件中
                 System.out.println("磁盘初始化成功,成功创建Sparrow.disk");
+            }else{
+                disk = getDiskDocument();
             }
         }
         return disk;

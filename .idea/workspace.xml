@@ -4,32 +4,12 @@
     <list default="true" id="cdb932d9-7e58-4d94-93a9-e7b232ef17da" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/enums/BlockReasonEnum.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/enums/DiskLabelEnum.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/filemanager/CurrentDirCatalog.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Sim-SparrowOS/filemanager/CurrentDirCatalog.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/filemanager/Disk.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/filemanager/DiskTest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/filemanager/FileCatalog.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Sim-SparrowOS/filemanager/FileCatalog.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/filemanager/fileserver/CopyFile.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Sim-SparrowOS/filemanager/fileserver/CopyFile.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/filemanager/fileserver/CreateFile.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Sim-SparrowOS/filemanager/fileserver/CreateFile.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/process/PCB.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Sim-SparrowOS/process/PCB.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/run/Controller.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Sim-SparrowOS/run/Controller.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/run/GUI.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Sim-SparrowOS/run/GUI.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/tools/FileNameTool.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/tools/FileNameToolTest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/enums/BlockReasonEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/enums/BlockingReasonEnum.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/enums/DiskLabelEnum.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/filemanager/CurrentDirCatalog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/filemanager/CurrentDirCatalog.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/filemanager/Disk.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/equipment/Disk.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/filemanager/DiskTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/equipment/DiskTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/filemanager/FileCatalog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/filemanager/FileCatalog.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/filemanager/fileserver/CopyFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/filemanager/fileserver/CopyFile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/filemanager/fileserver/CreateFile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/filemanager/fileserver/CreateFile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/process/PCB.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/process/PCB.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/run/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/run/Controller.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/run/GUI.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/run/GUI.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tools/FileNameTool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tools/FileTool.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tools/FileNameToolTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/tools/FileToolTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/equipment/Disk.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Sim-SparrowOS/equipment/Disk.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/equipment/DiskBlock.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Sim-SparrowOS/equipment/DiskBlock.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Sim-SparrowOS/equipment/DiskTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Sim-SparrowOS/equipment/DiskTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/equipment/Disk.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/equipment/Disk.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/equipment/DiskBlock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/equipment/DiskBlock.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/equipment/DiskTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/equipment/DiskTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -323,7 +303,9 @@
       <workItem from="1606120681992" duration="1221000" />
       <workItem from="1606999374434" duration="4384000" />
       <workItem from="1607824501920" duration="24210000" />
-      <workItem from="1608023397958" duration="16225000" />
+      <workItem from="1608023397958" duration="16333000" />
+      <workItem from="1608118167569" duration="4658000" />
+      <workItem from="1608127501471" duration="1075000" />
     </task>
     <servers />
   </component>
@@ -353,42 +335,42 @@
     </state>
     <state x="549" y="168" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1602991219617" />
     <state x="591" y="176" key="FileChooserDialogImpl/65.0.1471.864@65.0.1471.864" timestamp="1605918668489" />
-    <state width="1493" height="261" key="GridCell.Tab.0.bottom" timestamp="1608041443094">
+    <state width="1493" height="261" key="GridCell.Tab.0.bottom" timestamp="1608126759750">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1608041443094" />
+    <state width="1493" height="261" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1608126759750" />
     <state width="1429" height="162" key="GridCell.Tab.0.bottom/65.0.1471.864@65.0.1471.864" timestamp="1604325601830" />
-    <state width="1493" height="261" key="GridCell.Tab.0.center" timestamp="1608041443094">
+    <state width="1493" height="261" key="GridCell.Tab.0.center" timestamp="1608126759750">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1608041443094" />
+    <state width="1493" height="261" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1608126759750" />
     <state width="1429" height="162" key="GridCell.Tab.0.center/65.0.1471.864@65.0.1471.864" timestamp="1604325601830" />
-    <state width="1493" height="261" key="GridCell.Tab.0.left" timestamp="1608041443094">
+    <state width="1493" height="261" key="GridCell.Tab.0.left" timestamp="1608126759750">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1608041443094" />
+    <state width="1493" height="261" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1608126759750" />
     <state width="1429" height="162" key="GridCell.Tab.0.left/65.0.1471.864@65.0.1471.864" timestamp="1604325601830" />
-    <state width="1493" height="261" key="GridCell.Tab.0.right" timestamp="1608041443094">
+    <state width="1493" height="261" key="GridCell.Tab.0.right" timestamp="1608126759750">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1608041443094" />
+    <state width="1493" height="261" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1608126759750" />
     <state width="1429" height="162" key="GridCell.Tab.0.right/65.0.1471.864@65.0.1471.864" timestamp="1604325601830" />
-    <state width="1493" height="261" key="GridCell.Tab.1.bottom" timestamp="1608041443095">
+    <state width="1493" height="261" key="GridCell.Tab.1.bottom" timestamp="1608126760397">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1608041443095" />
-    <state width="1493" height="261" key="GridCell.Tab.1.center" timestamp="1608041443094">
+    <state width="1493" height="261" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1608126760397" />
+    <state width="1493" height="261" key="GridCell.Tab.1.center" timestamp="1608126760397">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1608041443094" />
-    <state width="1493" height="261" key="GridCell.Tab.1.left" timestamp="1608041443094">
+    <state width="1493" height="261" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1608126760397" />
+    <state width="1493" height="261" key="GridCell.Tab.1.left" timestamp="1608126760396">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1608041443094" />
-    <state width="1493" height="261" key="GridCell.Tab.1.right" timestamp="1608041443095">
+    <state width="1493" height="261" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1608126760396" />
+    <state width="1493" height="261" key="GridCell.Tab.1.right" timestamp="1608126760397">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1608041443095" />
+    <state width="1493" height="261" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1608126760397" />
     <state x="303" y="77" key="SettingsEditor" timestamp="1605917395339">
       <screen x="65" y="0" width="1471" height="864" />
     </state>
@@ -417,30 +399,27 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="470" y="40" key="refactoring.ChangeSignatureDialog/0.0.1536.824@0.0.1536.824" timestamp="1603017533801" />
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1608041563683">
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1608128536315">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1608041563683" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1608128536315" />
     <state x="478" y="152" width="672" height="711" key="search.everywhere.popup/65.0.1471.864@65.0.1471.864" timestamp="1605924583387" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/src/equipment/Disk.java</url>
-          <line>117</line>
-          <properties class="equipment.Disk" method="output2DiskDocument">
-            <option name="EMULATED" value="true" />
-          </properties>
-          <option name="timeStamp" value="27" />
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/equipment/DiskTest.java</url>
+          <line>18</line>
+          <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/equipment/Disk.java</url>
-          <line>45</line>
-          <properties class="equipment.Disk" method="&lt;init&gt;">
+          <line>105</line>
+          <properties class="equipment.Disk" method="getDiskDocument">
             <option name="EMULATED" value="true" />
           </properties>
-          <option name="timeStamp" value="29" />
+          <option name="timeStamp" value="34" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
