@@ -11,6 +11,8 @@ public enum FileTypeEnum {
 
     TXT_FILE(2,"txt文本文件"),
 
+    ELSE_FILE(404,"其他文件"),
+
     ;
 
     private int code;

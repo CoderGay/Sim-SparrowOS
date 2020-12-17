@@ -25,10 +25,15 @@ public enum SizeEnum {
 
     BLOCKS_SIZE(64,"盘块大小"),
 
-    AVALIABLE_BLOCKS(0,"可用盘块标志"),
+    AVAILABLE_BLOCKS(0,"可用盘块标志"),
 
     END_BLOCKS_LABEL(-1,"文件结束标志"),
 
+    BAD_BLOCKS_LABEL(258,"盘块损坏标志"),
+
+    FILLED_DISK_LABEL(259,"硬盘已满"),
+
+    BLANK_FILE_SIZE(1,"空文件默认大小"),
 
     ;
 

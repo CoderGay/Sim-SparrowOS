@@ -51,3 +51,10 @@ OS Simulation Program
     实现了对文件的对象序列化流读写;
     修复了disk文件读写bug    
                 
+2020-12-17 更新：
+
+    创建了逻辑文件SparrowFile类;
+    更新了模拟磁盘文件写操作
+    更新了createFile类
+    更新了FileTool类,添加了方法(将文件分解成适合磁盘块装载的大小)
+                      

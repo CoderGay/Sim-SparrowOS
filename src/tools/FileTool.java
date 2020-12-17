@@ -1,10 +1,15 @@
 package tools;
 
+import enums.SizeEnum;
 import filemanager.CurrentDirCatalog;
 import equipment.Disk;
 import filemanager.FileCatalog;
+import filemanager.file.Document;
+import filemanager.file.SparrowFile;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Create By  @林俊杰
@@ -50,7 +55,8 @@ public class FileTool {
     }
 
     //TODO: 此处需要递归
-    /*private static boolean hasAbsolutePath(String absolutePath){
+    /*
+    private static boolean hasAbsolutePath(String absolutePath){
 
         Disk disk = Disk.getDisk();
         String []dirs = absolutePath.split("/");
@@ -102,5 +108,34 @@ public class FileTool {
         File file = new File(filename);
         return file.exists();
     }
+
+    public static List<Document> decomposeFile(SparrowFile file){
+        List<Document> resultFiles = new ArrayList<>();
+        if (file.getSize()< SizeEnum.BLOCKS_SIZE.getCode()){
+            System.out.println("[分解失败]:无需分解,该文件大小仅为"+file.getSize()+"B!");
+            return null;
+        }
+        int divided = file.getSize()/SizeEnum.BLOCKS_SIZE.getCode();
+        int strStartIndex = 0;
+        String allData  = file.getData();
+        for (int i = 0; i < divided; i++) {
+            SparrowFile apartFile = new SparrowFile();
+            apartFile.setFileCatalog(file.getFileCatalog());
+            apartFile.setSize(SizeEnum.BLOCKS_SIZE.getCode());
+            apartFile.setData(allData.substring(strStartIndex,strStartIndex+SizeEnum.BLOCKS_SIZE.getCode()));
+            resultFiles.add(apartFile);
+            strStartIndex+=SizeEnum.BLOCKS_SIZE.getCode();
+        }
+        if (file.getSize()%SizeEnum.BLOCKS_SIZE.getCode()!=0){
+            SparrowFile apartFile = new SparrowFile();
+            apartFile.setFileCatalog(file.getFileCatalog());
+            apartFile.setSize(SizeEnum.BLOCKS_SIZE.getCode());
+            apartFile.setData(allData.substring(strStartIndex,allData.length()));
+            resultFiles.add(apartFile);
+        }
+
+        return resultFiles;
+    }
+
 
 }
