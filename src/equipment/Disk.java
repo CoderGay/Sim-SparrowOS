@@ -185,8 +185,8 @@ public class Disk implements Serializable,Device{
             writeDisk(fileCatalog.getStartIndex(),data);
         }else{
             List<Document> blockFileList = FileTool.decomposeFile(data);
+            blockIndex = fileCatalog.getStartIndex();
             for (int i = 0; i <blockFileList.size(); i++) {
-                blockIndex = fileCatalog.getStartIndex();
                 writeDisk(blockIndex, blockFileList.get(i));
                 //如果比文件原来的大则申请盘块空间;
                 if (fileAllocateTable[blockIndex]==SizeEnum.END_BLOCKS_LABEL.getCode()&&i<blockFileList.size()-1){
