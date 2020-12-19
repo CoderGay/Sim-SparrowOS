@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.effect.Glow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 
-<AnchorPane fx:id="parent" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="run.Controller">
+<AnchorPane fx:id="parent" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="705.0" prefWidth="1174.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="run.Controller">
    <children>
-      <ImageView fx:id="desktop_wallpaper" fitHeight="720.0" fitWidth="1280.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="desktop_wallpaper" fitHeight="720.0" fitWidth="1175.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../resource/icon/wallhaven-test1.jpg" />
+            <Image url="@../resource/icon/wallpaper_framework.jpg" />
          </image></ImageView>
-      <Pane fx:id="desktop_pane" onContextMenuRequested="#desktop_right_click" prefHeight="720.0" prefWidth="1286.0" />
+      <Pane fx:id="desktop_pane" onContextMenuRequested="#desktop_right_click" prefHeight="720.0" prefWidth="1200.0" />
       <Label prefHeight="709.0" prefWidth="1280.0">
          <contextMenu>
             <ContextMenu>
@@ -27,5 +30,39 @@
             </ContextMenu>
          </contextMenu>
       </Label>
+      <ImageView fx:id="fileManager_ImageView" fitHeight="68.0" fitWidth="72.0" layoutX="287.0" layoutY="613.0" onMouseClicked="#openFileManager" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../resource/icon/fileManager2.png" />
+         </image>
+         <effect>
+            <Glow level="1.0" />
+         </effect>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </ImageView>
+      <HBox prefHeight="36.0" prefWidth="1200.0" />
+      <ImageView fx:id="close_ImageView" fitHeight="75.0" fitWidth="75.0" layoutX="191.0" layoutY="612.0" onMouseClicked="#close_desktop" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../resource/icon/关机.png" />
+         </image>
+         <effect>
+            <Glow level="1.0" />
+         </effect>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </ImageView>
+      <ImageView fx:id="command_ImageView" fitHeight="75.0" fitWidth="75.0" layoutX="374.0" layoutY="609.0" onMouseClicked="#openCommand" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../resource/icon/command.png" />
+         </image>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <effect>
+            <Glow level="1.0" />
+         </effect>
+      </ImageView>
    </children>
 </AnchorPane>
