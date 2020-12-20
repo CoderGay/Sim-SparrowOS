@@ -184,7 +184,7 @@ public class Disk implements Serializable,Device{
         if(fileCatalog.getFileLength()<SizeEnum.BLOCKS_SIZE.getCode()){
             writeDisk(fileCatalog.getStartIndex(),data);
         }else{
-            List<Document> blockFileList = FileTool.decomposeFile(data);
+            List<SparrowFile> blockFileList = FileTool.decomposeFile(data);
             blockIndex = fileCatalog.getStartIndex();
             for (int i = 0; i <blockFileList.size(); i++) {
                 writeDisk(blockIndex, blockFileList.get(i));
@@ -230,16 +230,6 @@ public class Disk implements Serializable,Device{
             //TODO 抛出异常
             return null;
         }
-//        int count = 0,temp = fileCatalog.getStartIndex() , label;
-//        while (fileAllocateTable[temp]!=SizeEnum.END_BLOCKS_LABEL.getCode()){
-//            label = fileAllocateTable[temp];
-//            fileAllocateTable[temp] = SizeEnum.AVAILABLE_BLOCKS.getCode();
-//            count++;
-//            temp = label;
-//        }
-//        fileAllocateTable[temp] = SizeEnum.AVAILABLE_BLOCKS.getCode();
-//        count++;
-//        availableBlocks+=count;
         recyclingBlock(fileCatalog.getStartIndex());
         return fileCatalog;
     }
@@ -302,7 +292,7 @@ public class Disk implements Serializable,Device{
         Document resultContent =  null;
         List<DiskBlock> blocks = getGivenDiskBlocks(fileCatalog);
         for (int i = 0; i < blocks.size(); i++) {
-
+            blocks.get(i).getData();
         }
 
         return resultContent;

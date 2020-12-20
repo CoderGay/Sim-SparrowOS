@@ -109,8 +109,8 @@ public class FileTool {
         return file.exists();
     }
 
-    public static List<Document> decomposeFile(SparrowFile file){
-        List<Document> resultFiles = new ArrayList<>();
+    public static List<SparrowFile> decomposeFile(SparrowFile file){
+        List<SparrowFile> resultFiles = new ArrayList<>();
         if (file.getSize()< SizeEnum.BLOCKS_SIZE.getCode()){
             System.out.println("[分解失败]:无需分解,该文件大小仅为"+file.getSize()+"B!");
             return null;
