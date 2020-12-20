@@ -1,5 +1,8 @@
 package filemanager;
 
+import enums.FileTypeEnum;
+import tools.FileTool;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,25 +29,28 @@ public class OpenFile {
         return openFile;
     }
 
-    //TODO 打开文件并更新'已打开文件表'(即openedFileList);
     public boolean openAFile(String fileName,int operationType){
-        //if (openedFileList.contains())
-        //TODO 检索所有文件表是否有该文件名的文件存在
         String []dirs = fileName.split("\\\\");
-            //TODO 1.以相对路径为文件名检索是否存在
-
-
-            //TODO 2.以绝对路径为文件名检索是否存在
-
-        /**
-         * 方案一：构建局部文件树(即当前目录为根节点)，检索文件树形目录结构
-         * 方案二: 构建局部文件链表(即当前目录为头指针)，顺序检索比较文件名。
-         * 以上两个方案所说的‘局部’都是指当前目录，当前目录的父目录以及兄弟目录都不能访问，直接抛搜索不到
-         * */
-        //TODO 找到文件名后,比较操作类型(读、写或只读)与文件的操作权限(是否为只读,能写)，确保不能以写方式打开只读文件；
-
-        //TODO 文件名和操作类型都符合规范后，最后填写已打开文件表，若文件已经打开则不需要填写已打开文件表。
-
+        FileCatalog fileCatalog = FileTool.isExist(fileName);
+        int[] operate = new int[4];
+        for (int i=3;i>=0;i--){
+            operate[i] = operationType%10;
+            operationType=operationType/10;
+        }
+        if (fileCatalog!=null){
+            //文件存在则打开,则先判断文件权限，然后添加到打开文件表中
+            if (fileCatalog.getFileAttribute()[FileTypeEnum.READONLY_LOCAL.getCode()]==1) {
+                //如果文件是只读权限，则需要判断打开方式
+                if (operate[3] == 1) {
+                    openedFileList.add(fileCatalog);
+                }
+            }else{
+                //如果文件具有读写权限，就直接打开
+                openedFileList.add(fileCatalog);
+            }
+        }else{
+            return false;
+        }
         return false;
     }
 

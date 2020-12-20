@@ -25,6 +25,8 @@ public enum SizeEnum {
 
     BLOCKS_SIZE(64,"盘块大小"),
 
+    BLOCKS_DIR_SIZE(8,"盘块中可以存储的目录项大小"),
+
     AVAILABLE_BLOCKS(0,"可用盘块标志"),
 
     END_BLOCKS_LABEL(-1,"文件结束标志"),

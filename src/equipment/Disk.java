@@ -4,9 +4,11 @@ import enums.FileTypeEnum;
 import enums.SizeEnum;
 import filemanager.FileCatalog;
 import filemanager.file.Document;
+import filemanager.file.SparrowDirectory;
 import filemanager.file.SparrowFile;
 import tools.FileTool;
 
+import javax.print.Doc;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +33,7 @@ public class Disk implements Serializable,Device{
     private int availableBlocks;
 
     //根目录 为目录文件和系统文件 在盘块4中
-    private FileCatalog root;
+    private SparrowDirectory root;
 
     private static String diskName;
 
@@ -47,9 +49,10 @@ public class Disk implements Serializable,Device{
 
     private Disk(){
         //初始化文件分配表和盘块
-        root = new FileCatalog("", FileTypeEnum.DIR_LABEL.getCode(),1010,4,SizeEnum.BLOCKS_SIZE.getCode());
+        FileCatalog fileCatalog = new FileCatalog("", FileTypeEnum.DIR_LABEL.getCode(),1010,4,SizeEnum.BLOCKS_SIZE.getCode());
+        root.getData().add(fileCatalog);
 
-        //使用disk.txt作为磁盘文件
+        //自定义磁盘文件
         try{
             diskName = System.getProperty("user.dir")+"/resource"+"/Sparrow.disk";
             if(!FileTool.isDiskFileExist(diskName)){
@@ -90,7 +93,7 @@ public class Disk implements Serializable,Device{
                     /**
                      * 根目录
                      * */
-                    else if(i==4)    diskBlockList.add(new DiskBlock<FileCatalog>(root));
+                    else if(i==4)    diskBlockList.add(new DiskBlock<SparrowDirectory>(root));
                     else diskBlockList.add(new DiskBlock());
                 }
 
@@ -254,7 +257,7 @@ public class Disk implements Serializable,Device{
     }
 
     //读取某个文件的所有盘块
-    private List<DiskBlock> getGivenDiskBlocks(FileCatalog fileCatalog){
+    public List<DiskBlock> getGivenDiskBlocks(FileCatalog fileCatalog){
         //StringBuilder strBuilder = new StringBuilder();
         List<DiskBlock> resultDiskBlockList = new ArrayList<>();
 
@@ -285,6 +288,7 @@ public class Disk implements Serializable,Device{
         }
 
         return resultDiskBlockList;
+<<<<<<< HEAD
     }
 
     //读取盘块内容
@@ -294,8 +298,13 @@ public class Disk implements Serializable,Device{
         for (int i = 0; i < blocks.size(); i++) {
             blocks.get(i).getData();
         }
+=======
+}
+>>>>>>> wen
 
-        return resultContent;
+    //读取某个盘块内容
+    public Document getBlockContent(int index){
+        return (Document) diskBlockList.get(index).getData();
     }
 
 
@@ -331,7 +340,7 @@ public class Disk implements Serializable,Device{
         return diskName;
     }
 
-    public FileCatalog getRoot() {
+    public SparrowDirectory getRoot() {
         return root;
     }
 
