@@ -1,6 +1,7 @@
 package filemanager;
 
 import equipment.Disk;
+import filemanager.file.SparrowDirectory;
 
 /**
  * @author WenZhikun
@@ -8,15 +9,15 @@ import equipment.Disk;
  */
 public class CurrentDirCatalog{
     //当前正在操作的文件目录
-    private static FileCatalog currentDir = null;
+    private static SparrowDirectory currentDir = null;
 
-    public static FileCatalog getCurrentDir(){
+    public static SparrowDirectory getCurrentDir(){
         if (currentDir==null){
             currentDir = Disk.getDisk().getRoot();
         }
         return currentDir;
     }
-    public static void setCurrentDir(FileCatalog f){
+    public static void setCurrentDir(SparrowDirectory f){
         currentDir=f;
     }
 }

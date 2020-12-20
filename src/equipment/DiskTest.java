@@ -17,7 +17,7 @@ class DiskTest {
     @Test
     void getDiskDocumentContent() throws IOException {
         Disk disk = Disk.getDisk();
-        System.out.println(disk.getRoot().getCatalogName());
+        System.out.println(disk.getRoot());
         System.out.println(disk.getAvailableBlocks());
         for (int a:disk.getFileAllocateTable()
              ) {

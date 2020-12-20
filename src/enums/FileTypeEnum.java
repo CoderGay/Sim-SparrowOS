@@ -13,6 +13,14 @@ public enum FileTypeEnum {
 
     ELSE_FILE(404,"其他文件"),
 
+    DIR_LOCAL(4,"目录属性位"),
+
+    FILE_LOCL(5,"文件属性位"),
+
+    SYSTEM_LOCAL(6,"系统文件位"),
+
+    READONLY_LOCAL(7,"只读文件位"),
+
     ;
 
     private int code;
