@@ -64,3 +64,6 @@ OS Simulation Program
 
     完善了FileTool中的“分解目录”、“合并文件”、“合并目录”、“判断文件或者目录是否存在”功能
     完善OpenFile类中“打开文件功能”
+    
+    修改了"SparrowDirctory"类的data类型为Document抽象类
+    增加了界面的树类视图,有待完善

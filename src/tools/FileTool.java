@@ -76,25 +76,25 @@ public class FileTool {
 
     public static FileCatalog hasFile(String[] path,SparrowDirectory directory){
         FileCatalog resultFileCatalog = null;
-        List<FileCatalog>fileCatalogList = directory.getData();
+        List<Document> directoryData = directory.getData();
         int index = 1;
         while(true){
-            for (FileCatalog f:fileCatalogList
+            for (Document d:directoryData
             ) {
-                if (path[index].equals(f.getCatalogName())){
-                    if (f.getExtensionName()==0){
+                if (path[index].equals(d.getFileCatalog().getCatalogName())){
+                    if (d.getFileCatalog().getExtensionName()==0){
                         //如果当前目录结点代表的是目录，且目录名字匹配，则继续向下查找
                         //获取子目录
-                        SparrowDirectory sparrowDirectory = getSparrowDirectory(f);
+                        SparrowDirectory sparrowDirectory = getSparrowDirectory(d.getFileCatalog());
                         if (sparrowDirectory==null){
                             System.out.println("[ERROR]目录项为空");
                             return null;
                         }else
-                            fileCatalogList = sparrowDirectory.getData();
+                            directoryData = sparrowDirectory.getData();
                         index++;
                         if (index== path.length-1){
                             //表示找到子目录
-                            return f;
+                            return d.getFileCatalog();
                         }
                         break;
                     }else{
@@ -103,7 +103,7 @@ public class FileTool {
                             return null;
                         }else{
                             //表示成功找到文件
-                            return f;
+                            return d.getFileCatalog();
                         }
                     }
                 }
@@ -138,9 +138,9 @@ public class FileTool {
         return file.exists();
     }
 
-    public static List<Document> decomposeFile(SparrowFile file){
+    public static List<SparrowFile> decomposeFile(SparrowFile file){
         //分解内容超过64B的文件
-        List<Document> resultFiles = new ArrayList<>();
+        List<SparrowFile> resultFiles = new ArrayList<>();
         if (file.getSize()< SizeEnum.BLOCKS_SIZE.getCode()){
             System.out.println("[分解失败]:无需分解,该文件大小仅为"+file.getSize()+"B!");
             return null;
@@ -169,8 +169,8 @@ public class FileTool {
 
 
     //分解字目录中list<FileCatalog>长度超过8的子目录
-    public static List<Document> decomposeDirectory(SparrowDirectory directory){
-        List<Document>resultDirectory = new ArrayList<>();
+    public static List<SparrowDirectory> decomposeDirectory(SparrowDirectory directory){
+        List<SparrowDirectory>resultDirectory = new ArrayList<>();
         if (directory.getData().size()<=SizeEnum.BLOCKS_DIR_SIZE.getCode()){
             System.out.println("[分解失败]无需分解，该子目录中仅有"+directory.getData().size()+"个目录项");
             return null;
@@ -178,21 +178,21 @@ public class FileTool {
         int divided = (directory.getData().size())/SizeEnum.BLOCKS_DIR_SIZE.getCode();
         int strStartIndex = 0;
         //子目录中含有的目录项结点的个数
-        List<FileCatalog>allData = directory.getData();
+        List<Document>allData = directory.getData();
         int length = allData.size()-1;
         //System.out.println(length);
         for (int i = 0; i < divided+1; i++) {
             SparrowDirectory apartDirectory = new SparrowDirectory();
             apartDirectory.setFileCatalog(directory.getFileCatalog());
-            List<FileCatalog>fileCatalogList = new ArrayList<>();
+            List<Document> subDataList = new ArrayList<>();
             for (int j=strStartIndex;j<strStartIndex+8;j++){
                 //System.out.println(j);
-                fileCatalogList.add(allData.get(j));
+                subDataList.add(allData.get(j));
                 if (j==length)
                     break;
             }
-            apartDirectory.setData(fileCatalogList);
-            apartDirectory.setSize(apartDirectory.getFileCatalog().getFileLength());
+            apartDirectory.setData(subDataList);
+            apartDirectory.setSize(apartDirectory.getData().size()*SizeEnum.BLOCKS_DIR_SIZE.getCode());
             resultDirectory.add(apartDirectory);
             strStartIndex+=SizeEnum.BLOCKS_DIR_SIZE.getCode();
         }
@@ -229,16 +229,18 @@ public class FileTool {
         SparrowDirectory resultDirectory = new SparrowDirectory();
         resultDirectory.setSize(fileCatalog.getFileLength());
         resultDirectory.setFileCatalog(fileCatalog);
-        List<FileCatalog>fileCatalogList = new ArrayList<>();
+        List<Document> directoryData = new ArrayList<>();
         for (DiskBlock d:diskBlocks
              ) {
             SparrowDirectory sparrowDirectory = (SparrowDirectory) d.getData();
-            for (int i=0;i<sparrowDirectory.getData().size();i++){
-                fileCatalogList.add(sparrowDirectory.getData().get(i));
-            }
+            /*for (int i=0;i<sparrowDirectory.getData().size();i++){
+                //fileCatalogList.add(sparrowDirectory.getData().get(i));
+                directoryData.add(sparrowDirectory.getData().get(i));
+            }*/
+            directoryData.addAll(sparrowDirectory.getData());
         }
-        resultDirectory.setData(fileCatalogList);
-        return null;
+        resultDirectory.setData(directoryData);
+        return resultDirectory;
     }
 
 }

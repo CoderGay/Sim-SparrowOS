@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -73,10 +74,10 @@ public class Controller {
     @FXML
     void openFileManager(MouseEvent event) throws IOException {
         if(event.getClickCount()==2){
-            AnchorPane fileManager_AnchorPane = FXMLLoader.load(getClass().getResource("FileManager.fxml"));
+            Parent fileManagerRoot = FXMLLoader.load(getClass().getResource("FileManager.fxml"));
             Stage fileManager_Stage = new Stage();
             fileManager_Stage.setTitle("文件资源管理器");
-            fileManager_Stage.setScene(new Scene(fileManager_AnchorPane));
+            fileManager_Stage.setScene(new Scene(fileManagerRoot));
             fileManager_Stage.show();
         }
     }

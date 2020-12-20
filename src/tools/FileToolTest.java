@@ -1,5 +1,6 @@
 package tools;
 
+import enums.SizeEnum;
 import equipment.Disk;
 import filemanager.FileCatalog;
 import filemanager.file.Document;
@@ -34,20 +35,23 @@ class FileToolTest {
     @Test
     void decomposeDir(){
         //分解目录测试
-        List<FileCatalog>list = new ArrayList<>();
+        List<Document>list = new ArrayList<>();
         for (int i=0;i<20;i++){
             FileCatalog fileCatalog = new FileCatalog();
             fileCatalog.setCatalogName(Integer.toString(i));
-            list.add(fileCatalog);
+            Document document = new SparrowDirectory();
+            document.setFileCatalog(fileCatalog);
+            document.setSize(SizeEnum.BLOCKS_DIR_SIZE.getCode());
+            list.add(document);
         }
         SparrowDirectory directory = new SparrowDirectory();
         directory.setData(list);
         FileCatalog fileCatalog = new FileCatalog("Test",0,00001000,100,list.size()*8);
         directory.setFileCatalog(fileCatalog);
         directory.setSize(directory.getFileCatalog().getFileLength());
-        List<Document>documents = FileTool.decomposeDirectory(directory);
-        if (documents!=null)
-            for (Document d:documents
+        List<SparrowDirectory>sparrowDirectories = FileTool.decomposeDirectory(directory);
+        if (sparrowDirectories!=null)
+            for (Document d:sparrowDirectories
             ) {
                 System.out.println(d.getSize());
                 System.out.println(d.getFileCatalog().getCatalogName());

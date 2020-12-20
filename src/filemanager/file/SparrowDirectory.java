@@ -12,13 +12,13 @@ import java.util.List;
  * @version 1.0
  */
 public class SparrowDirectory extends Document {
-    private List<FileCatalog> data = new ArrayList<>();
+    private List<Document> data = new ArrayList<>();
 
-    public List<FileCatalog> getData() {
+    public List<Document> getData() {
         return data;
     }
 
-    public void setData(List<FileCatalog> data) {
+    public void setData(List<Document> data) {
         this.data = data;
     }
 }

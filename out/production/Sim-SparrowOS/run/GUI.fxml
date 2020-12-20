@@ -30,7 +30,7 @@
             </ContextMenu>
          </contextMenu>
       </Label>
-      <ImageView fx:id="fileManager_ImageView" fitHeight="68.0" fitWidth="72.0" layoutX="287.0" layoutY="613.0" onMouseClicked="#openFileManager" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="fileManager_ImageView" fitHeight="68.0" fitWidth="72.0" layoutX="287.0" layoutY="613.0" onMouseClicked="#openFileManager" pickOnBounds="true" preserveRatio="true" style="-fx-cursor: hand;">
          <image>
             <Image url="@../resource/icon/fileManager2.png" />
          </image>

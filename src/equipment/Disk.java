@@ -50,7 +50,11 @@ public class Disk implements Serializable,Device{
     private Disk(){
         //初始化文件分配表和盘块
         FileCatalog fileCatalog = new FileCatalog("", FileTypeEnum.DIR_LABEL.getCode(),1010,4,SizeEnum.BLOCKS_SIZE.getCode());
-        root.getData().add(fileCatalog);
+        //root.getData().add(fileCatalog);
+        root.setFileCatalog(fileCatalog);
+        List<Document> nullList = new ArrayList<>();
+        root.setData(nullList);
+        root.setSize(SizeEnum.BLANK_FILE_SIZE.getCode() );
 
         //自定义磁盘文件
         try{
@@ -288,7 +292,7 @@ public class Disk implements Serializable,Device{
         }
 
         return resultDiskBlockList;
-<<<<<<< HEAD
+
     }
 
     //读取盘块内容
@@ -298,9 +302,9 @@ public class Disk implements Serializable,Device{
         for (int i = 0; i < blocks.size(); i++) {
             blocks.get(i).getData();
         }
-=======
+        return  resultContent;
 }
->>>>>>> wen
+
 
     //读取某个盘块内容
     public Document getBlockContent(int index){
