@@ -2,6 +2,7 @@ package filemanager.file;
 
 import filemanager.FileCatalog;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
  *
  * @version 1.0
  */
-public class SparrowDirectory extends Document {
+public class SparrowDirectory extends Document implements Serializable {
     private List<Document> data = new ArrayList<>();
 
     public List<Document> getData() {

@@ -2,13 +2,15 @@ package filemanager.file;
 
 import filemanager.FileCatalog;
 
+import java.io.Serializable;
+
 /**
  * Create By  @林俊杰
  * 2020/12/17 15:49
  *
  * @version 1.0
  */
-public abstract class Document {
+public abstract class Document implements Serializable {
     private int size;
 
     FileCatalog fileCatalog;

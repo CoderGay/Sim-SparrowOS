@@ -51,6 +51,7 @@ public class Disk implements Serializable,Device{
         //初始化文件分配表和盘块
         FileCatalog fileCatalog = new FileCatalog("", FileTypeEnum.DIR_LABEL.getCode(),1010,4,SizeEnum.BLOCKS_SIZE.getCode());
         //root.getData().add(fileCatalog);
+        root = new SparrowDirectory();
         root.setFileCatalog(fileCatalog);
         List<Document> nullList = new ArrayList<>();
         root.setData(nullList);

@@ -61,6 +61,15 @@ public class FileCatalog implements Serializable {
     public FileCatalog() {
     }
 
+    @Override
+    public String toString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("文件名称："+catalogName);
+        stringBuilder.append(" 文件类型："+extensionName);
+        stringBuilder.append(" 文件大小 "+fileLength+"\n");
+        return stringBuilder.toString();
+    }
+
     /**
      * set/get
      */

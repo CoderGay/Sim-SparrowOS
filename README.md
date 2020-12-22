@@ -67,3 +67,8 @@ OS Simulation Program
     
     修改了"SparrowDirctory"类的data类型为Document抽象类
     增加了界面的树类视图,有待完善
+    
+2020-12-20更新：
+
+    增加了界面的流动面板显示文件
+    完善了界面的树类视图,只需给出完整的逻辑根目录即可显示 
