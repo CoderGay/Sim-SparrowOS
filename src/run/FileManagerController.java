@@ -9,9 +9,7 @@ import filemanager.file.Document;
 import filemanager.file.SparrowDirectory;
 import filemanager.file.SparrowFile;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.fxml.JavaFXBuilderFactory;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -22,11 +20,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,11 +121,19 @@ public class FileManagerController implements Initializable {
     private ContextMenu rightClickContextMenu;
     private ContextMenu fileContextMenu;
 
+
+    MenuItem copyMenuItem =  new MenuItem("复制");
+    MenuItem pasteIntoFileMenuItem =  new MenuItem("粘贴");
+    MenuItem deleteMenuItem =  new MenuItem("删除");
     MenuItem detailMenuItem =  new MenuItem("属性");
+
+    MenuItem pasteMenuItem =  new MenuItem("粘贴");
 
     private int newNum = 0; //一个全局变量,添加在文件名后面,用于防止新建文件夹或文件重名
 
     private SparrowDirectory tempHistoryDir;
+
+    private Document clipboard;//剪贴板
 
     /**
      * 初始化右键菜单
@@ -138,7 +142,7 @@ public class FileManagerController implements Initializable {
         rightClickContextMenu = new ContextMenu();
         fileContextMenu = new ContextMenu();
 
-        MenuItem pasteMenuItem =  new MenuItem("粘贴");
+
         MenuItem newFileMenuItem =  new MenuItem("新建文本文件");
         MenuItem newDirsMenuItem =  new MenuItem("新建文件夹");
         newDirsMenuItem.setOnAction(event -> {
@@ -191,15 +195,10 @@ public class FileManagerController implements Initializable {
         rightClickContextMenu.getItems().clear();
         rightClickContextMenu.getItems().addAll(pasteMenuItem,newMenu);
 
-        MenuItem openMenuItem =  new MenuItem("打开");
-        MenuItem copyMenuItem =  new MenuItem("复制");
-        MenuItem pasteIntoFileMenuItem =  new MenuItem("粘贴");
-        MenuItem deleteMenuItem =  new MenuItem("删除");
-
 
         //先清理一下,免得越加越多
         fileContextMenu.getItems().clear();
-        fileContextMenu.getItems().addAll(openMenuItem,copyMenuItem,pasteIntoFileMenuItem,deleteMenuItem,detailMenuItem);
+        fileContextMenu.getItems().addAll(copyMenuItem,pasteIntoFileMenuItem,deleteMenuItem,detailMenuItem);
 
     }
 
@@ -240,9 +239,10 @@ public class FileManagerController implements Initializable {
         dirsImage3.setFitHeight(40);
         refresh_Label.setGraphic(dirsImage3);
         refresh_Label = setLabelOnMouseFocus(refresh_Label);
-        return_Label.setOnMouseClicked(event -> {
+        refresh_Label.setOnMouseClicked(event -> {
             document_FlowPane.getChildren().clear();
             showDocumentIcon(CurrentDirCatalog.getCurrentDir());
+            System.out.println("用户刷新了一下");
         });
     }
 
@@ -281,6 +281,7 @@ public class FileManagerController implements Initializable {
      * */
     public void showDocumentIcon(SparrowDirectory sparrowDirectory){
         List<Document> directoryData = sparrowDirectory.getData();
+        setPasteMenuItem();
         //设置外边距
         document_FlowPane.setPadding(new Insets(10));
         //水平间距
@@ -335,8 +336,14 @@ public class FileManagerController implements Initializable {
         dirsLabel.setOnMouseClicked(event -> {
             if (event.getButton()==MouseButton.SECONDARY ){//右键单击
                 fileContextMenu.show(dirsLabel,event.getScreenX(),event.getScreenY());
-                //设置该选项的属性
+                //设置该选项的属性菜单项
                 setAttributeMenuItem(document);
+                //设置该选项的复制菜单项
+                setCopyMenuItem(document);
+                //设置该选项的粘贴菜单项
+                failedPasteMenuItem();
+                //设置该选项的删除菜单项
+                setDeleteMenuItem(document);
             }
         });
         dirsLabel.setContentDisplay(ContentDisplay.TOP);//让它上下布局显示
@@ -368,8 +375,14 @@ public class FileManagerController implements Initializable {
             }else if (event.getButton()==MouseButton.SECONDARY ){
                 //右键单击
                 fileContextMenu.show(dirsLabel,event.getScreenX(),event.getScreenY());
-                //设置该选项的属性
+                //设置该选项的属性菜单项
                 setAttributeMenuItem(directory);
+                //设置该选项的复制菜单项
+                setCopyMenuItem(directory);
+                //设置该选项的粘贴菜单项
+                setPasteIntoFileMenuItem((SparrowDirectory) directory);
+                //设置该选项的删除菜单项
+                setDeleteMenuItem(directory);
             }else{
                 fileContextMenu.hide();
             }
@@ -383,19 +396,11 @@ public class FileManagerController implements Initializable {
         return dirsLabel;
     }
 
-
     /**
      * 装载属性菜单项
      * */
     private void setAttributeMenuItem(Document doc){
         detailMenuItem.setOnAction(event -> {
-            /**
-             * 此处加载顺序不能乱来,
-             * 必须先通过fxml获取FXMLLoader,
-             * 然后设置工厂建造,
-             * 先启动加载程序并顺便把返回值交给AnchorPane
-             * 再然后才能获取到Controller;
-             * */
             AnchorPane attribute_AnchorPane = new AnchorPane();
             attribute_AnchorPane = loadAttribute(attribute_AnchorPane,doc);
             Stage attribute_Stage = new Stage();
@@ -404,6 +409,72 @@ public class FileManagerController implements Initializable {
             Scene attributeScene = new Scene(attribute_AnchorPane);
             attribute_Stage.setScene(attributeScene);
             attribute_Stage.show();
+        });
+    }
+
+    /**
+     * 装载复制菜单项
+     * */
+    private void setCopyMenuItem(Document doc){
+        copyMenuItem.setOnAction(event -> {
+            clipboard = doc;
+            System.out.println(clipboard.toString()+"已被复制到剪贴板");
+        });
+    }
+
+    /**
+     * 装载粘贴菜单项
+     * */
+    private void setPasteIntoFileMenuItem(SparrowDirectory doc){
+        pasteIntoFileMenuItem.setOnAction(event -> {
+            if (clipboard==null){
+                System.out.println("剪贴板为空");
+                return;
+            }
+
+            //TODO 把文件粘贴到该目录下
+            List<Document> data = doc.getData();
+            data.add(clipboard);
+            doc.setData(data);
+            //TODO 把这个文件装进硬盘
+            System.out.println(clipboard.toString()+"完成粘贴");
+        });
+    }
+    private void failedPasteMenuItem(){
+        pasteIntoFileMenuItem.setOnAction(event -> {
+            System.out.println("别调皮!");
+        });
+    }
+
+    /**
+     * 装载删除菜单项
+     * */
+    private void setDeleteMenuItem(Document doc){
+        deleteMenuItem.setOnAction(event -> {
+            //TODO 删除doc文件并刷新
+
+            //刷新
+            System.out.println("已成功删除"+doc.toString());
+            /*document_FlowPane.getChildren().clear();
+            showDocumentIcon(CurrentDirCatalog.getCurrentDir());*/
+        });
+    }
+
+    /**
+     * 装载粘贴菜单项
+     * */
+    private void setPasteMenuItem(){
+        pasteMenuItem.setOnAction(event -> {
+            if (clipboard==null){
+                System.out.println("剪贴板为空");
+                return;
+            }
+            SparrowDirectory currentDir = CurrentDirCatalog.getCurrentDir();
+            List<Document> data = currentDir.getData();
+            data.add(clipboard);
+            currentDir.setData(data);
+            //TODO 装载回去,即将currentDir写回硬盘;
+            System.out.println(clipboard+"粘贴成功");
         });
     }
 
