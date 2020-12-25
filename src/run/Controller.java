@@ -84,11 +84,11 @@ public class Controller {
 
     @FXML
     void openCommand(MouseEvent event) throws IOException {
-        AnchorPane fileManager_AnchorPane = FXMLLoader.load(getClass().getResource("Command.fxml"));
-        Stage fileManager_Stage = new Stage();
-        fileManager_Stage.setTitle("命令提示符");
-        fileManager_Stage.setScene(new Scene(fileManager_AnchorPane));
-        fileManager_Stage.show();
+        AnchorPane command_AnchorPane = FXMLLoader.load(getClass().getResource("Command.fxml"));
+        Stage command_Stage = new Stage();
+        command_Stage.setTitle("命令提示符");
+        command_Stage.setScene(new Scene(command_AnchorPane));
+        command_Stage.show();
     }
 
     @FXML

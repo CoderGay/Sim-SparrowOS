@@ -7,10 +7,15 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Main extends Application {
 
     private double xOffset = 0;
     private double yOffset = 0;
+
+    public static Map<String, Object> controllers = new HashMap<String, Object>();
 
     @Override
     public void start(Stage primaryStage) throws Exception{

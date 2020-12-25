@@ -9,16 +9,24 @@ import filemanager.file.Document;
 import filemanager.file.SparrowDirectory;
 import filemanager.file.SparrowFile;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.fxml.JavaFXBuilderFactory;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +125,11 @@ public class FileManagerController implements Initializable {
     private ContextMenu rightClickContextMenu;
     private ContextMenu fileContextMenu;
 
+    MenuItem detailMenuItem =  new MenuItem("属性");
+
     private int newNum = 0; //一个全局变量,添加在文件名后面,用于防止新建文件夹或文件重名
+
+    private SparrowDirectory tempHistoryDir;
 
     /**
      * 初始化右键菜单
@@ -146,6 +158,8 @@ public class FileManagerController implements Initializable {
             directory.setFileCatalog(fileCatalog);
             directory.setData(new ArrayList<>());
             directory.setSize(fileCatalog.getFileLength());
+            //以上都是要删除的数据,真实数据需要后台给个SparrowDirectory;
+
             Label label = loadDirsIconLabel(directory);
             document_FlowPane.getChildren().add(label);
         });
@@ -168,7 +182,7 @@ public class FileManagerController implements Initializable {
             file.setData("");
             file.setSize(fileCatalog.getFileLength());
 
-            Label label = loadDocIconLabel("resource/icon/txt.png",file.getFileCatalog().getCatalogName());
+            Label label = loadDocIconLabel(file,"resource/icon/txt.png");
             document_FlowPane.getChildren().add(label);
         });
         Menu newMenu = new Menu("新建");
@@ -181,7 +195,8 @@ public class FileManagerController implements Initializable {
         MenuItem copyMenuItem =  new MenuItem("复制");
         MenuItem pasteIntoFileMenuItem =  new MenuItem("粘贴");
         MenuItem deleteMenuItem =  new MenuItem("删除");
-        MenuItem detailMenuItem =  new MenuItem("属性");
+
+
         //先清理一下,免得越加越多
         fileContextMenu.getItems().clear();
         fileContextMenu.getItems().addAll(openMenuItem,copyMenuItem,pasteIntoFileMenuItem,deleteMenuItem,detailMenuItem);
@@ -197,6 +212,13 @@ public class FileManagerController implements Initializable {
         dirsImage.setFitHeight(40);
         return_Label.setGraphic(dirsImage);
         return_Label = setLabelOnMouseFocus(return_Label);
+        return_Label.setOnMouseClicked(event -> {
+            tempHistoryDir = CurrentDirCatalog.getCurrentDir();
+            CurrentDirCatalog.setCurrentDir(CurrentDirCatalog.getFatherDir());
+            document_FlowPane.getChildren().clear();
+            showDocumentIcon(CurrentDirCatalog.getCurrentDir());
+        });
+
 
         ImageView dirsImage2  = new ImageView("resource/icon/return.png");
         dirsImage2.setFitWidth(40);
@@ -204,12 +226,24 @@ public class FileManagerController implements Initializable {
         dirsImage2.setRotate(180);//旋转180°
         go_Label.setGraphic(dirsImage2);
         go_Label = setLabelOnMouseFocus(go_Label);
+        go_Label.setOnMouseClicked(event -> {
+            //如果都没点击去过就没有啦
+            if(tempHistoryDir!=null){
+                CurrentDirCatalog.setCurrentDir(tempHistoryDir);
+                document_FlowPane.getChildren().clear();
+                showDocumentIcon(CurrentDirCatalog.getCurrentDir());
+            }
+        });
 
         ImageView dirsImage3  = new ImageView("resource/icon/refresh.png");
         dirsImage3.setFitWidth(40);
         dirsImage3.setFitHeight(40);
         refresh_Label.setGraphic(dirsImage3);
         refresh_Label = setLabelOnMouseFocus(refresh_Label);
+        return_Label.setOnMouseClicked(event -> {
+            document_FlowPane.getChildren().clear();
+            showDocumentIcon(CurrentDirCatalog.getCurrentDir());
+        });
     }
 
     /**
@@ -247,7 +281,6 @@ public class FileManagerController implements Initializable {
      * */
     public void showDocumentIcon(SparrowDirectory sparrowDirectory){
         List<Document> directoryData = sparrowDirectory.getData();
-
         //设置外边距
         document_FlowPane.setPadding(new Insets(10));
         //水平间距
@@ -255,12 +288,9 @@ public class FileManagerController implements Initializable {
         document_FlowPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             //右键菜单
             if(event.getButton() == MouseButton.SECONDARY && !fileContextMenu.isShowing()){
-
                 rightClickContextMenu.show(document_FlowPane,event.getScreenX(),event.getScreenY());
-                System.out.println(rightClickContextMenu.isShowing());
             }else{
                 rightClickContextMenu.hide();
-                System.out.println(rightClickContextMenu.isShowing());
             }
         });
 
@@ -269,20 +299,24 @@ public class FileManagerController implements Initializable {
                 //如果是目录则显示目录标签
                 Label dirsLabel = loadDirsIconLabel(directoryData.get(i));
                 document_FlowPane.getChildren().add(dirsLabel);
+                setAttributeMenuItem(directoryData.get(i));
             }else if (directoryData.get(i) instanceof SparrowFile){
                 //如果不是目录,则
                 if(directoryData.get(i).getFileCatalog().getExtensionName() == FileTypeEnum.EXE_FILE.getCode()){
                     //如果是可执行文件则显示exe标签
-                    Label dirsLabel = loadDocIconLabel("resource/icon/exe.png", directoryData.get(i).getFileCatalog().getCatalogName());
+                    Label dirsLabel = loadDocIconLabel(directoryData.get(i),"resource/icon/exe.png");
                     document_FlowPane.getChildren().add(dirsLabel);
+                    setAttributeMenuItem(directoryData.get(i));
                 }else if(directoryData.get(i).getFileCatalog().getExtensionName() == FileTypeEnum.TXT_FILE.getCode()){
                     //如果是文本文件则显示文本标签
-                    Label dirsLabel = loadDocIconLabel("resource/icon/txt.png", directoryData.get(i).getFileCatalog().getCatalogName());
+                    Label dirsLabel = loadDocIconLabel(directoryData.get(i),"resource/icon/txt.png");
                     document_FlowPane.getChildren().add(dirsLabel);
+                    setAttributeMenuItem(directoryData.get(i));
                 }else{
                     //如果是未知文件则显示未知标签
-                    Label dirsLabel = loadDocIconLabel("resource/icon/unknownDoc.png", directoryData.get(i).getFileCatalog().getCatalogName());
+                    Label dirsLabel = loadDocIconLabel(directoryData.get(i),"resource/icon/unknownDoc.png");
                     document_FlowPane.getChildren().add(dirsLabel);
+                    setAttributeMenuItem(directoryData.get(i));
                 }
             }
         }
@@ -291,7 +325,9 @@ public class FileManagerController implements Initializable {
     /**
      * 装载文件图标信息
      * */
-    private Label loadDocIconLabel(String imageUrl,String fileName){
+    private Label loadDocIconLabel(Document document,String imageUrl){
+        String fileName = document.getFileCatalog().getCatalogName();
+
         ImageView dirsImage  = new ImageView(imageUrl);
         dirsImage.setFitHeight(100);
         dirsImage.setFitWidth(100);
@@ -299,6 +335,8 @@ public class FileManagerController implements Initializable {
         dirsLabel.setOnMouseClicked(event -> {
             if (event.getButton()==MouseButton.SECONDARY ){//右键单击
                 fileContextMenu.show(dirsLabel,event.getScreenX(),event.getScreenY());
+                //设置该选项的属性
+                setAttributeMenuItem(document);
             }
         });
         dirsLabel.setContentDisplay(ContentDisplay.TOP);//让它上下布局显示
@@ -330,6 +368,8 @@ public class FileManagerController implements Initializable {
             }else if (event.getButton()==MouseButton.SECONDARY ){
                 //右键单击
                 fileContextMenu.show(dirsLabel,event.getScreenX(),event.getScreenY());
+                //设置该选项的属性
+                setAttributeMenuItem(directory);
             }else{
                 fileContextMenu.hide();
             }
@@ -341,6 +381,30 @@ public class FileManagerController implements Initializable {
             dirsLabel.setStyle("-fx-background-color: transparent");
         });
         return dirsLabel;
+    }
+
+
+    /**
+     * 装载属性菜单项
+     * */
+    private void setAttributeMenuItem(Document doc){
+        detailMenuItem.setOnAction(event -> {
+            /**
+             * 此处加载顺序不能乱来,
+             * 必须先通过fxml获取FXMLLoader,
+             * 然后设置工厂建造,
+             * 先启动加载程序并顺便把返回值交给AnchorPane
+             * 再然后才能获取到Controller;
+             * */
+            AnchorPane attribute_AnchorPane = new AnchorPane();
+            attribute_AnchorPane = loadAttribute(attribute_AnchorPane,doc);
+            Stage attribute_Stage = new Stage();
+            attribute_Stage.setTitle("属性");
+            attribute_Stage.setAlwaysOnTop(true);
+            Scene attributeScene = new Scene(attribute_AnchorPane);
+            attribute_Stage.setScene(attributeScene);
+            attribute_Stage.show();
+        });
     }
 
     /**
@@ -369,6 +433,159 @@ public class FileManagerController implements Initializable {
         SparrowDirectory curDirCatalog = CurrentDirCatalog.getCurrentDir();
         showDocumentIcon(curDirCatalog);
 
+    }
+
+    private AnchorPane loadAttribute(AnchorPane attribute_AnchorPane,Document document){
+        /**
+         * 初始化控件
+         */
+        ImageView attribute_ImageView = new ImageView();
+        attribute_ImageView.setFitHeight(50);
+        attribute_ImageView.setFitWidth(50);
+        attribute_ImageView.setLayoutX(27);
+        attribute_ImageView.setLayoutY(28);
+
+        TextField attribute_TextField = new TextField();
+        attribute_TextField.setLayoutX(99);
+        attribute_TextField.setLayoutY(38);
+        attribute_TextField.setFocusTraversable(false);
+
+        Label position_text_Label = new Label();
+        position_text_Label.setText("位置:");
+        position_text_Label.setStyle("-fx-background-color: transparent");
+        position_text_Label.setPrefHeight(30);
+        position_text_Label.setPrefWidth(36);
+        position_text_Label.setLayoutX(51);
+        position_text_Label.setLayoutY(129);
+
+        Label size_text_Label = new Label();
+        size_text_Label.setText("大小:");
+        size_text_Label.setStyle("-fx-background-color: transparent");
+        size_text_Label.setPrefHeight(30);
+        size_text_Label.setPrefWidth(36);
+        size_text_Label.setLayoutX(51);
+        size_text_Label.setLayoutY(189);
+
+        Label type_text_Label = new Label();
+        type_text_Label.setText("类型:");
+        type_text_Label.setStyle("-fx-background-color: transparent");
+        type_text_Label.setPrefHeight(30);
+        type_text_Label.setPrefWidth(36);
+        type_text_Label.setLayoutX(51);
+        type_text_Label.setLayoutY(243);
+
+        Label privilege_text_Label = new Label();
+        privilege_text_Label.setText("权限:");
+        privilege_text_Label.setStyle("-fx-background-color: transparent");
+        privilege_text_Label.setPrefHeight(30);
+        privilege_text_Label.setPrefWidth(36);
+        privilege_text_Label.setLayoutX(51);
+        privilege_text_Label.setLayoutY(320);
+
+        Label position_Label = new Label();
+        position_Label.setPrefHeight(30);
+        position_Label.setPrefWidth(202);
+        position_Label.setStyle("-fx-background-color: transparent");
+        position_Label.setLayoutX(99);
+        position_Label.setLayoutY(129);
+
+        Label size_Label = new Label();
+        size_Label.setPrefHeight(30);
+        size_Label.setPrefWidth(202);
+        size_Label.setStyle("-fx-background-color: transparent");
+        size_Label.setLayoutX(99);
+        size_Label.setLayoutY(189);
+
+        Label type_Label = new Label();
+        type_Label.setPrefHeight(30);
+        type_Label.setPrefWidth(202);
+        type_Label.setStyle("-fx-background-color: transparent");
+        type_Label.setLayoutX(99);
+        type_Label.setLayoutY(243);
+
+        Line line0 = new Line();
+        line0.setLayoutX(121);
+        line0.setLayoutY(91);
+        line0.setStartX(-100);
+        line0.setStartY(0);
+        line0.setEndX(202);
+        line0.setEndY(0);
+        line0.setStyle("-fx-stroke: #9f9f9f");
+
+        Line line2 = new Line();
+        line2.setLayoutX(122);
+        line2.setLayoutY(296);
+        line2.setStartX(-100);
+        line2.setStartY(0);
+        line2.setEndX(202);
+        line2.setEndY(0);
+        line2.setStyle("-fx-stroke: #9f9f9f");
+
+
+        /**
+         * 装载图片
+         * */
+        Image image;
+        if (document instanceof SparrowDirectory){
+            image = new Image("resource/icon/directory.png");
+        }else{
+            if (document.getFileCatalog().getExtensionName()== FileTypeEnum.TXT_FILE.getCode())
+                image = new Image("resource/icon/txt.png");
+            else if (document.getFileCatalog().getExtensionName()== FileTypeEnum.EXE_FILE.getCode())
+                image = new Image("resource/icon/exe.png");
+            else
+                image = new Image("resource/icon/unknownDoc.png");
+        }
+        attribute_ImageView.setImage(image);
+
+        String[] strings = document.getFileCatalog().getCatalogName().split("/");
+        String fileName = strings[strings.length-1];
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < strings.length-1; i++) {
+            stringBuilder.append(strings[i]);
+        }
+        String position = stringBuilder.toString();
+        /**
+         * 装载文件名
+         * */
+        attribute_TextField.setText(fileName);
+        /**
+         * 装载文件位置
+         * */
+        position_Label.setText(position);
+        /**
+         * 装载文件大小
+         * */
+        size_Label.setText(String.valueOf(document.getFileCatalog().getFileLength())+"B");
+        /**
+         * 装载文件类型
+         * */
+
+        if (document.getFileCatalog().getExtensionName()==FileTypeEnum.TXT_FILE.getCode()){
+            type_Label.setText(".txt");
+        }else if(document.getFileCatalog().getExtensionName()==FileTypeEnum.EXE_FILE.getCode()){
+            type_Label.setText(".exe");
+        }else if (document.getFileCatalog().getExtensionName()==FileTypeEnum.DIR_LABEL.getCode()){
+            type_Label.setText("文件夹");
+        }else{
+            type_Label.setText("未知文件");
+        }
+
+        RadioButton radioButton = new RadioButton();
+        radioButton.setPrefWidth(59);
+        radioButton.setPrefHeight(20);
+        radioButton.setLayoutX(114);
+        radioButton.setLayoutY(325);
+        radioButton.setText("只读");
+        if(document.getFileCatalog().getFileAttribute()!=null&&document.getFileCatalog().getFileAttribute()[7]==1){
+            radioButton.setSelected(true);
+        }
+
+        attribute_AnchorPane.getChildren().addAll(attribute_ImageView,attribute_TextField,position_text_Label,size_text_Label,type_text_Label,privilege_text_Label,position_Label,size_Label,type_Label,line0,line2,radioButton);
+        attribute_AnchorPane.setPrefWidth(347);
+        attribute_AnchorPane.setPrefHeight(408);
+
+        return attribute_AnchorPane;
     }
 
 }

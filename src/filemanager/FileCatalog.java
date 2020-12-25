@@ -1,6 +1,7 @@
 package filemanager;
 
 import enums.FileTypeEnum;
+import javafx.beans.property.IntegerProperty;
 
 import javax.print.DocFlavor;
 import java.io.Serializable;
@@ -40,7 +41,6 @@ public class FileCatalog implements Serializable {
     private int writePointBlock;
     //写文件指针所在块内地址，初始化为0
     private int writePointIndex;
-
 
     /**
      * constructor

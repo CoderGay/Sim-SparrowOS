@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+
+<!--        fx:controller="run.AttributeController"-->
+
+<AnchorPane prefHeight="408.0" prefWidth="347.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ImageView fx:id="attribute_ImageView" fitHeight="50.0" fitWidth="50.0" layoutX="27.0" layoutY="28.0" pickOnBounds="true" preserveRatio="true" />
+      <TextField fx:id="attribute_TextField" focusTraversable="false" layoutX="99.0" layoutY="38.0">
+         <cursor>
+            <Cursor fx:constant="TEXT" />
+         </cursor>
+      </TextField>
+      <Label layoutX="51.0" layoutY="129.0" prefHeight="30.0" prefWidth="36.0" style="-fx-background-color: transparent;" text="位置:" />
+      <Line endX="202.0" layoutX="121.0" layoutY="91.0" startX="-100.0" stroke="#9f9f9f" />
+      <Label layoutX="51.0" layoutY="189.0" prefHeight="30.0" prefWidth="36.0" style="-fx-background-color: transparent;" text="大小:" />
+      <Label layoutX="51.0" layoutY="243.0" prefHeight="30.0" prefWidth="36.0" style="-fx-background-color: transparent;" text="类型:" />
+      <Line endX="202.0" layoutX="122.0" layoutY="296.0" startX="-100.0" stroke="#9f9f9f" />
+      <Label layoutX="51.0" layoutY="320.0" prefHeight="30.0" prefWidth="36.0" style="-fx-background-color: transparent;" text="权限:" />
+      <RadioButton layoutX="114.0" layoutY="325.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="59.0" text="只读" />
+      <RadioButton layoutX="200.0" layoutY="325.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="59.0" text="隐藏" />
+      <Label fx:id="position_Label" layoutX="99.0" layoutY="129.0" prefHeight="30.0" prefWidth="202.0" style="-fx-background-color: transparent;" />
+      <Label fx:id="size_Label" layoutX="99.0" layoutY="189.0" prefHeight="30.0" prefWidth="202.0" style="-fx-background-color: transparent;" />
+      <Label fx:id="type_Label" layoutX="99.0" layoutY="243.0" prefHeight="30.0" prefWidth="202.0" style="-fx-background-color: transparent;" />
+   </children>
+</AnchorPane>
