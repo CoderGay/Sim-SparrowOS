@@ -52,5 +52,9 @@
          </children>
       </VBox>
       <FlowPane fx:id="document_FlowPane" layoutX="327.0" layoutY="92.0" prefHeight="595.0" prefWidth="873.0" />
+      <Label fx:id="return_Label" layoutX="343.0" layoutY="42.0" prefHeight="39.0" prefWidth="40.0" style="-fx-background-radius: 8px;" />
+      <Label fx:id="go_Label" layoutX="410.0" layoutY="42.0" prefHeight="39.0" prefWidth="40.0" style="-fx-background-radius: 8px;" />
+      <Label fx:id="refresh_Label" layoutX="475.0" layoutY="42.0" prefHeight="39.0" prefWidth="40.0" style="-fx-background-radius: 8px;" />
+
    </children>
 </AnchorPane>
