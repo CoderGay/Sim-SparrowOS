@@ -22,12 +22,15 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import tools.FileTool;
@@ -52,6 +55,9 @@ public class FileManagerController implements Initializable {
     private Label path_Label;
 
     @FXML
+    private Label absolutePath_Label;
+
+    @FXML
     private TreeView<String> fileTree_TreeView;
 
     @FXML
@@ -72,6 +78,11 @@ public class FileManagerController implements Initializable {
     @FXML
     private TableView<DiskBlockVO> disk_TableView;
 
+    /**
+     * 测试数据,记得要删除
+     * */
+    private SparrowDirectory sparrowDirectory = new SparrowDirectory();
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         refreshPath();
@@ -82,7 +93,7 @@ public class FileManagerController implements Initializable {
         /**
          * 测试数据,待会要删掉哈
          * */
-        SparrowDirectory sparrowDirectory = new SparrowDirectory();
+
         List<Document> documentList = new ArrayList<>();
         for (int i = 0; i <10; i++) {
             SparrowDirectory directory1 = new SparrowDirectory();
@@ -143,6 +154,7 @@ public class FileManagerController implements Initializable {
     MenuItem pasteIntoFileMenuItem =  new MenuItem("粘贴");
     MenuItem deleteMenuItem =  new MenuItem("删除");
     MenuItem detailMenuItem =  new MenuItem("属性");
+    MenuItem renameMenuItem =  new MenuItem("重命名");
 
     MenuItem pasteMenuItem =  new MenuItem("粘贴");
 
@@ -150,6 +162,7 @@ public class FileManagerController implements Initializable {
      * 文本文件中的菜单项
      * */
     MenuItem saveMenuItem = new MenuItem("保存");
+    MenuItem deleteTxtMenuItem = new MenuItem("清空");
 
     /**
      * 文本文件中的控件
@@ -161,6 +174,11 @@ public class FileManagerController implements Initializable {
      * 文件的提示框控件
      * */
     Tooltip file_Tooltip = new Tooltip();
+
+    /**
+     * 属性面板的控件
+     * */
+    TextField attribute_TextField = new TextField();
 
     private int newNum = 0; //一个全局变量,添加在文件名后面,用于防止新建文件夹或文件重名
 
@@ -231,7 +249,7 @@ public class FileManagerController implements Initializable {
 
         //先清理一下,免得越加越多
         fileContextMenu.getItems().clear();
-        fileContextMenu.getItems().addAll(copyMenuItem,pasteIntoFileMenuItem,deleteMenuItem,detailMenuItem);
+        fileContextMenu.getItems().addAll(copyMenuItem,pasteIntoFileMenuItem,deleteMenuItem,renameMenuItem,detailMenuItem);
 
     }
 
@@ -290,6 +308,19 @@ public class FileManagerController implements Initializable {
         path_Label.setGraphic(imageView);
         path_Label.setPadding(new Insets(10));
         path_Label.setText(pathName);
+        absolutePath_Label.setPadding(new Insets(10));
+        StringBuilder strBuilder = new StringBuilder();
+        String[] split = CurrentDirCatalog.getCurrentDir().getFileCatalog().getCatalogName().split("/");
+        if (split.length==0){
+            strBuilder.append("根目录");
+        }else {
+            strBuilder.append("根目录");
+            for (int i = 1; i < split.length; i++) {
+                strBuilder.append("> ");
+                strBuilder.append(split[i]);
+            }
+        }
+        absolutePath_Label.setText(strBuilder.toString());
     }
 
     /**
@@ -373,8 +404,7 @@ public class FileManagerController implements Initializable {
      * 装载文件图标信息
      * */
     private Label loadDocIconLabel(Document document,String imageUrl){
-        String fileName = document.getFileCatalog().getCatalogName();
-
+        String fileName = FileTool.getEndFileName(document.getFileCatalog().getCatalogName());
         ImageView dirsImage  = new ImageView(imageUrl);
         dirsImage.setFitHeight(100);
         dirsImage.setFitWidth(100);
@@ -390,6 +420,8 @@ public class FileManagerController implements Initializable {
                 failedPasteMenuItem();
                 //设置该选项的删除菜单项
                 setDeleteMenuItem(document);
+                //设置该选项的重命名菜单项
+                setRenameMenuItem(document);
             }else if(event.getButton() == MouseButton.PRIMARY){
                 if (document.getFileCatalog().getExtensionName()==FileTypeEnum.TXT_FILE.getCode()){
                     showTXTDocument((SparrowFile) document);
@@ -416,10 +448,11 @@ public class FileManagerController implements Initializable {
      * 装载文件夹图标信息
      * */
     private Label loadDirsIconLabel(Document directory){
+        String directoryName = FileTool.getEndFileName(directory.getFileCatalog().getCatalogName());
         ImageView dirsImage  = new ImageView("resource/icon/directory.png");
         dirsImage.setFitHeight(100);
         dirsImage.setFitWidth(100);
-        Label dirsLabel = new Label(directory.getFileCatalog().getCatalogName(),dirsImage);
+        Label dirsLabel = new Label(directoryName,dirsImage);
         dirsLabel.setContentDisplay(ContentDisplay.TOP);//让它上下布局显示
         final Document document_i = directory;
         dirsLabel.setOnMouseClicked(event-> {
@@ -440,6 +473,8 @@ public class FileManagerController implements Initializable {
                 setPasteIntoFileMenuItem((SparrowDirectory) directory);
                 //设置该选项的删除菜单项
                 setDeleteMenuItem(directory);
+                //设置该选项的重命名菜单项
+                setRenameMenuItem(directory);
             }else{
                 fileContextMenu.hide();
             }
@@ -460,14 +495,8 @@ public class FileManagerController implements Initializable {
      * */
     private void setAttributeMenuItem(Document doc){
         detailMenuItem.setOnAction(event -> {
-            AnchorPane attribute_AnchorPane = new AnchorPane();
-            attribute_AnchorPane = loadAttribute(attribute_AnchorPane,doc);
-            Stage attribute_Stage = new Stage();
-            attribute_Stage.setTitle("属性");
-            attribute_Stage.setAlwaysOnTop(true);
-            Scene attributeScene = new Scene(attribute_AnchorPane);
-            attribute_Stage.setScene(attributeScene);
-            attribute_Stage.show();
+            attribute_TextField.setFocusTraversable(false);
+            showAttributeWindow(doc);
         });
     }
 
@@ -502,6 +531,30 @@ public class FileManagerController implements Initializable {
     private void failedPasteMenuItem(){
         pasteIntoFileMenuItem.setOnAction(event -> {
             System.out.println("别调皮!");
+        });
+    }
+
+    /**
+     * 装载重命名菜单项
+     * */
+    private void setRenameMenuItem(Document document){
+        renameMenuItem.setOnAction(event -> {
+            attribute_TextField.setEditable(true);
+            attribute_TextField.setFocusTraversable(true);
+            attribute_TextField.setOnKeyPressed(event1 -> {
+                if (event1.getCode()== KeyCode.ENTER){
+                    String newFileName = attribute_TextField.getText();
+                    String curCatalog = CurrentDirCatalog.getCurrentDir().getFileCatalog().getCatalogName();
+                    System.out.println(document.getFileCatalog().getCatalogName()+"的文件名已改为："+newFileName);
+                    document.getFileCatalog().setCatalogName(curCatalog+"/"+newFileName);
+                    attribute_TextField.setText(newFileName);
+
+                    //TODO 重命名后保存至硬盘,并刷新显示
+                    document_FlowPane.getChildren().clear();
+                    showDocumentIcon(sparrowDirectory);//刷新了一下
+                }
+            });
+            showAttributeWindow(document);
         });
     }
 
@@ -565,6 +618,24 @@ public class FileManagerController implements Initializable {
 
     }
 
+    /**
+     * 展示属性窗口
+     * */
+    private void showAttributeWindow(Document doc){
+        AnchorPane attribute_AnchorPane = new AnchorPane();
+        attribute_AnchorPane = loadAttribute(attribute_AnchorPane,doc);
+        Stage attribute_Stage = new Stage();
+        attribute_Stage.setTitle("属性");
+        attribute_Stage.setAlwaysOnTop(true);
+        Scene attributeScene = new Scene(attribute_AnchorPane);
+        attribute_Stage.setScene(attributeScene);
+        attribute_Stage.show();
+    }
+
+
+    /**
+     * 装载属性面板
+     * */
     private AnchorPane loadAttribute(AnchorPane attribute_AnchorPane,Document document){
         /**
          * 初始化控件
@@ -575,10 +646,9 @@ public class FileManagerController implements Initializable {
         attribute_ImageView.setLayoutX(27);
         attribute_ImageView.setLayoutY(28);
 
-        TextField attribute_TextField = new TextField();
         attribute_TextField.setLayoutX(99);
         attribute_TextField.setLayoutY(38);
-        attribute_TextField.setFocusTraversable(false);
+
 
         Label position_text_Label = new Label();
         position_text_Label.setText("位置:");
@@ -740,7 +810,7 @@ public class FileManagerController implements Initializable {
         Menu editMenu = new Menu("编辑");
         Menu helpMenu = new Menu("帮助");
 
-        MenuItem deleteTxtMenuItem = new MenuItem("删除");
+        setDeleteTxtMenuItem();
         MenuItem aboutMenuItem = new MenuItem("关于");
 
 
@@ -791,6 +861,15 @@ public class FileManagerController implements Initializable {
             String fileName = FileTool.getEndFileName(txtFile.getFileCatalog().getCatalogName());
             System.out.println("已保存："+txtFile.getData()+"至"+fileName);
 
+        });
+    }
+
+    /**
+     * 设置文本编辑器的清空菜单项
+     * */
+    private void setDeleteTxtMenuItem(){
+        deleteTxtMenuItem.setOnAction(event -> {
+            textArea.setText("");
         });
     }
 

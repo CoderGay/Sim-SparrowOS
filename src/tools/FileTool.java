@@ -247,7 +247,7 @@ public class FileTool {
     public static String getEndFileName(String filePath){
         String result;
         String[] split = filePath.split("/");
-        if (split==null||split[0].equals("")){
+        if (split.length==0){
             result = "根目录";
         }else if(split.length==1){
             result = split[0];
@@ -275,7 +275,7 @@ public class FileTool {
         StringBuilder stringBuilder = new StringBuilder();
         int startIndex = document.getFileCatalog().getStartIndex();
         while(startIndex!=SizeEnum.END_BLOCKS_LABEL.getCode()){
-            stringBuilder.append(startIndex);
+            stringBuilder.append(startIndex+1);
             startIndex = fileAllocateTable[startIndex];
             if (startIndex!=SizeEnum.END_BLOCKS_LABEL.getCode())
                 stringBuilder.append(",");
