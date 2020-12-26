@@ -1,18 +1,25 @@
 package run;
 
+import VO.DiskBlockVO;
 import enums.FileTypeEnum;
 import enums.SizeEnum;
 import equipment.Disk;
+import equipment.DiskBlock;
 import filemanager.CurrentDirCatalog;
 import filemanager.FileCatalog;
 import filemanager.file.Document;
 import filemanager.file.SparrowDirectory;
 import filemanager.file.SparrowFile;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -21,7 +28,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import tools.FileTool;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -38,6 +47,9 @@ public class FileManagerController implements Initializable {
 
     @FXML
     private AnchorPane fileManager_AnchorPane;
+
+    @FXML
+    private Label path_Label;
 
     @FXML
     private TreeView<String> fileTree_TreeView;
@@ -57,11 +69,16 @@ public class FileManagerController implements Initializable {
     @FXML
     private Label refresh_Label;
 
+    @FXML
+    private TableView<DiskBlockVO> disk_TableView;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        refreshPath();
         showTree();
         initContextMenu();
         initLabel();
+        loadDiskTableView();
         /**
          * 测试数据,待会要删掉哈
          * */
@@ -128,6 +145,22 @@ public class FileManagerController implements Initializable {
     MenuItem detailMenuItem =  new MenuItem("属性");
 
     MenuItem pasteMenuItem =  new MenuItem("粘贴");
+
+    /**
+     * 文本文件中的菜单项
+     * */
+    MenuItem saveMenuItem = new MenuItem("保存");
+
+    /**
+     * 文本文件中的控件
+     * */
+    TextArea textArea =  new TextArea();
+
+
+    /**
+     * 文件的提示框控件
+     * */
+    Tooltip file_Tooltip = new Tooltip();
 
     private int newNum = 0; //一个全局变量,添加在文件名后面,用于防止新建文件夹或文件重名
 
@@ -247,6 +280,19 @@ public class FileManagerController implements Initializable {
     }
 
     /**
+     * 刷新当前路径显示
+     * */
+    private void refreshPath(){
+        String pathName = FileTool.getEndFileName(CurrentDirCatalog.getCurrentDir().getFileCatalog().getCatalogName());
+        ImageView imageView = new ImageView("resource/icon/资源管理器.png");
+        imageView.setFitWidth(20);
+        imageView.setFitHeight(20);
+        path_Label.setGraphic(imageView);
+        path_Label.setPadding(new Insets(10));
+        path_Label.setText(pathName);
+    }
+
+    /**
      * 选中动画效果
      * */
     private Label setLabelOnMouseFocus(Label pLabel){
@@ -344,11 +390,21 @@ public class FileManagerController implements Initializable {
                 failedPasteMenuItem();
                 //设置该选项的删除菜单项
                 setDeleteMenuItem(document);
+            }else if(event.getButton() == MouseButton.PRIMARY){
+                if (document.getFileCatalog().getExtensionName()==FileTypeEnum.TXT_FILE.getCode()){
+                    showTXTDocument((SparrowFile) document);
+                }else if(document.getFileCatalog().getExtensionName()==FileTypeEnum.EXE_FILE.getCode()){
+                    showTipWindow(document.getFileCatalog().getCatalogName(),"程序已运行");
+                }else {
+                    showTipWindow(document.getFileCatalog().getCatalogName(),"未找到可打开该文件程序");
+                }
             }
         });
         dirsLabel.setContentDisplay(ContentDisplay.TOP);//让它上下布局显示
         dirsLabel.setOnMouseEntered(event -> {
             dirsLabel.setStyle("-fx-background-color: #808080");
+            setFileTooltip(document);
+            dirsLabel.setTooltip(file_Tooltip);
         });
         dirsLabel.setOnMouseExited(event -> {
             dirsLabel.setStyle("-fx-background-color: transparent");
@@ -369,6 +425,7 @@ public class FileManagerController implements Initializable {
         dirsLabel.setOnMouseClicked(event-> {
             //左键单击
             if (event.getButton() == MouseButton.PRIMARY){
+                refreshPath();
                 CurrentDirCatalog.setCurrentDir((SparrowDirectory)document_i);
                 document_FlowPane.getChildren().clear();
                 showDocumentIcon((SparrowDirectory)document_i);
@@ -389,6 +446,8 @@ public class FileManagerController implements Initializable {
         });
         dirsLabel.setOnMouseEntered(event -> {
             dirsLabel.setStyle("-fx-background-color: #808080");
+            setFileTooltip(directory);
+            dirsLabel.setTooltip(file_Tooltip);
         });
         dirsLabel.setOnMouseExited(event -> {
             dirsLabel.setStyle("-fx-background-color: transparent");
@@ -659,4 +718,151 @@ public class FileManagerController implements Initializable {
         return attribute_AnchorPane;
     }
 
+    /**
+     * 展示文本编辑器
+     * */
+    private void showTXTDocument(SparrowFile sparrowFile){
+        /**
+         * 初始化控件
+         */
+        AnchorPane txt_AnchorPane = new AnchorPane();
+        txt_AnchorPane.setPrefHeight(400);
+        txt_AnchorPane.setPrefWidth(600);
+
+
+        textArea.setLayoutY(29);
+        textArea.setPrefHeight(359);
+        textArea.setPrefWidth(600);
+        textArea.setStyle("-fx-background-color: transparent, white, transparent, white");
+
+        MenuBar menuBar = new MenuBar();
+        Menu fileMenu = new Menu("文件");
+        Menu editMenu = new Menu("编辑");
+        Menu helpMenu = new Menu("帮助");
+
+        MenuItem deleteTxtMenuItem = new MenuItem("删除");
+        MenuItem aboutMenuItem = new MenuItem("关于");
+
+
+        fileMenu.getItems().addAll(saveMenuItem);
+        editMenu.getItems().addAll(deleteTxtMenuItem);
+        helpMenu.getItems().addAll(aboutMenuItem);
+        menuBar.getMenus().addAll(fileMenu,editMenu,helpMenu);
+        menuBar.setPrefHeight(32);
+        menuBar.setPrefWidth(600);
+
+        setSaveMenuItem(sparrowFile);
+
+        Label txtLengthLabel = new Label();
+        txtLengthLabel.setLayoutX(524);
+        txtLengthLabel.setLayoutY(386);
+        txtLengthLabel.setPrefHeight(20);
+        txtLengthLabel.setPrefWidth(76);
+
+        String data;
+        if (sparrowFile.getData()!=null){
+            data = sparrowFile.getData();
+        }else {
+            data = "";
+        }
+        textArea.setText(data);
+        txtLengthLabel.setText(String.valueOf(data.length()));
+
+        txt_AnchorPane.getChildren().addAll(textArea,menuBar,txtLengthLabel);
+        Stage txt_Stage = new Stage();
+        txt_Stage.setTitle(sparrowFile.getFileCatalog().getCatalogName());
+        txt_Stage.setAlwaysOnTop(true);
+        Scene txtScene = new Scene(txt_AnchorPane);
+        txt_Stage.setScene(txtScene);
+        txt_Stage.show();
+
+    }
+
+    /**
+     * 设置保存菜单项
+     * */
+    private void setSaveMenuItem(SparrowFile txtFile){
+        saveMenuItem.setOnAction(event -> {
+            //TODO 保存
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(textArea.getText());
+            txtFile.setData(stringBuilder.toString());
+            //TODO 保存至硬盘
+            String fileName = FileTool.getEndFileName(txtFile.getFileCatalog().getCatalogName());
+            System.out.println("已保存："+txtFile.getData()+"至"+fileName);
+
+        });
+    }
+
+    private void showTipWindow(String title,String tip){
+
+        Alert information = new Alert(Alert.AlertType.INFORMATION,tip);
+        information.setTitle(title);         //设置标题，不设置默认标题为本地语言的information
+        information.setHeaderText(title);    //设置头标题，默认标题为本地语言的information
+        information.show();
+    }
+
+    private void loadDiskTableView(){
+
+        /**
+         * 声明表格的列控件
+         * */
+        //每个Table的列
+        TableColumn numCol = new TableColumn("盘块号");
+        // 设置宽度
+        numCol.setMinWidth(35);
+        // 设置分箱的类下面的属性名
+        numCol.setCellValueFactory(
+                new PropertyValueFactory<>("num"));
+
+        TableColumn isAvailableCol = new TableColumn("是否可用");
+        isAvailableCol.setMinWidth(50);
+        isAvailableCol.setCellValueFactory(
+                new PropertyValueFactory<>("isAvailable"));
+
+        TableColumn occupiedSizeCol = new TableColumn("占用大小");
+        occupiedSizeCol.setMinWidth(50);
+        occupiedSizeCol.setCellValueFactory(
+                new PropertyValueFactory<>("occupiedSize"));
+
+        TableColumn nextIndexCol = new TableColumn("后续盘块号");
+        nextIndexCol.setMinWidth(60);
+        nextIndexCol.setCellValueFactory(
+                new PropertyValueFactory<>("nextIndex"));
+
+
+        ObservableList<DiskBlockVO> targetData =
+                        FXCollections.observableArrayList();
+
+        /**
+         * 组装数据源
+         * */
+        Disk disk = Disk.getDisk();
+        int[] fileAllocateTable = disk.getFileAllocateTable();
+        List<DiskBlock> diskBlockList = disk.getDiskBlockList();
+        for(int i=0;i<diskBlockList.size();i++){
+            DiskBlockVO diskBlockVO = new DiskBlockVO(i+1,diskBlockList.get(i).isAvailable(),diskBlockList.get(i).getOccupiedSize(),fileAllocateTable[i]);
+            targetData.add(diskBlockVO);
+        }
+
+        /**
+         * 装载数据
+         * */
+        disk_TableView.setItems(targetData);
+        /**
+         * 装载列
+         * */
+        disk_TableView.getColumns().addAll(numCol,isAvailableCol, occupiedSizeCol,nextIndexCol);
+    }
+
+    /**
+     * 设置提示控件内容
+     * */
+    private void setFileTooltip(Document document){
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append("文件类型:"+FileTool.getExtensionName(document));
+        strBuilder.append("\n大小:"+document.getFileCatalog().getFileLength()+"B");
+        strBuilder.append("\n所占盘块号："+FileTool.getOccupiedDiskBlockNum(document));
+        file_Tooltip.setText(strBuilder.toString());
+    }
 }

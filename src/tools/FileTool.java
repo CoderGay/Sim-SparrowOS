@@ -1,5 +1,6 @@
 package tools;
 
+import enums.FileTypeEnum;
 import enums.SizeEnum;
 import equipment.DiskBlock;
 import filemanager.CurrentDirCatalog;
@@ -243,4 +244,42 @@ public class FileTool {
         return resultDirectory;
     }
 
+    public static String getEndFileName(String filePath){
+        String result;
+        String[] split = filePath.split("/");
+        if (split==null||split[0].equals("")){
+            result = "根目录";
+        }else if(split.length==1){
+            result = split[0];
+        }else{
+            result = split[split.length-1];
+        }
+        return result;
+    }
+
+    public static String getExtensionName(Document document){
+        String result = "未知文件";
+        if (document.getFileCatalog().getExtensionName()== FileTypeEnum.DIR_LABEL.getCode()){
+            result = "目录";
+        }else if (document.getFileCatalog().getExtensionName()== FileTypeEnum.EXE_FILE.getCode()){
+            result = "可执行文件";
+        }else if(document.getFileCatalog().getExtensionName()== FileTypeEnum.TXT_FILE.getCode()){
+            result = "文本文件";
+        }
+        return result;
+    }
+
+    public static String getOccupiedDiskBlockNum(Document document){
+        Disk disk = Disk.getDisk();
+        int[] fileAllocateTable = disk.getFileAllocateTable();
+        StringBuilder stringBuilder = new StringBuilder();
+        int startIndex = document.getFileCatalog().getStartIndex();
+        while(startIndex!=SizeEnum.END_BLOCKS_LABEL.getCode()){
+            stringBuilder.append(startIndex);
+            startIndex = fileAllocateTable[startIndex];
+            if (startIndex!=SizeEnum.END_BLOCKS_LABEL.getCode())
+                stringBuilder.append(",");
+        }
+        return stringBuilder.toString();
+    }
 }
