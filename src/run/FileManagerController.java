@@ -927,6 +927,7 @@ public class FileManagerController implements Initializable {
         /**
          * 装载数据
          * */
+        disk_TableView.getItems().clear();
         disk_TableView.setItems(targetData);
         /**
          * 装载列
@@ -944,4 +945,30 @@ public class FileManagerController implements Initializable {
         strBuilder.append("\n所占盘块号："+FileTool.getOccupiedDiskBlockNum(document));
         file_Tooltip.setText(strBuilder.toString());
     }
+
+    /**
+     * 刷新当前面板
+     * */
+    private void refreshFlowPaneDisplay(){
+        document_FlowPane.getChildren().clear();
+        showDocumentIcon(CurrentDirCatalog.getCurrentDir());
+    }
+
+    /**
+     * 刷新当前目录树
+     * */
+    private void refreshFileTree(){
+        rootNode.getChildren().clear();
+        showTree();
+    }
+
+    /**
+     * 刷新磁盘块显示表
+     * */
+    private void refreshDiskBlockTable(){
+        loadDiskTableView();
+    }
+
+
+
 }
