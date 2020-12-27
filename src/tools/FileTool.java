@@ -124,6 +124,17 @@ public class FileTool {
         System.out.println("Find File is "+filePath);
 
         String[] paths = filePath.split("/");
+        /**
+         * 测试数据
+         * */
+        if (paths.length>0)
+        for (String node:paths
+             ) {
+            System.out.println("path_: "+node);
+        }
+        /**
+         * 以上为测试数据
+         * */
 
         if (paths.length==1){
             return Disk.getDisk().getRoot().getFileCatalog();
@@ -142,7 +153,7 @@ public class FileTool {
                 System.out.println(documentList.get(j).getFileCatalog().toString());
                 if (index==paths.length-1){
                     System.out.println("success found !");
-                    return documentList.get(index).getFileCatalog();
+                    return documentList.get(j).getFileCatalog();
                 }else{
                     j=0;
                     index++;
@@ -278,7 +289,7 @@ public class FileTool {
             System.out.println("结点为空！");
             return null;
         }
-        List<DiskBlock>diskBlocks=Disk.getDisk().getGivenDiskBlocks(fileCatalog);
+        List<DiskBlock> diskBlocks = Disk.getDisk().getGivenDiskBlocks(fileCatalog);
         if (diskBlocks.size()==1){
             System.out.println("[合并失败]该目录仅占用一个盘块");
             return  (SparrowDirectory)diskBlocks.get(0).getData();
@@ -474,9 +485,10 @@ public class FileTool {
         while(startIndex!=SizeEnum.END_BLOCKS_LABEL.getCode()){
             stringBuilder.append(startIndex+1);
             startIndex = fileAllocateTable[startIndex];
-            if (startIndex!=SizeEnum.END_BLOCKS_LABEL.getCode())
-                stringBuilder.append(",");
+            //if (startIndex!=SizeEnum.END_BLOCKS_LABEL.getCode())
+            stringBuilder.append(",");
         }
+        stringBuilder.append(startIndex+1);
         return stringBuilder.toString();
     }
 

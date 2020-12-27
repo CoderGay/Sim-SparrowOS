@@ -85,10 +85,10 @@ public class FileManagerController implements Initializable {
     @FXML
     private TableView<DiskBlockVO> disk_TableView;
 
-    /**
-     * 测试数据,记得要删除
-     * */
-    private SparrowDirectory sparrowDirectory = new SparrowDirectory();
+//    /**
+//     * 测试数据,记得要删除
+//     * */
+//    private SparrowDirectory sparrowDirectory = new SparrowDirectory();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -149,7 +149,9 @@ public class FileManagerController implements Initializable {
          * 测试数据装填完毕
          * */
 
-        showDocumentIcon(sparrowDirectory);
+        Disk disk = Disk.getDisk();
+        SparrowDirectory root = disk.getRoot();
+        showDocumentIcon(root);
     }
 
     private TreeItem<String> rootNode;
@@ -206,23 +208,7 @@ public class FileManagerController implements Initializable {
         newDirsMenuItem.setOnAction(event -> {
             //TODO 创建文件夹应该返回一个在物理层面创建成功的SparrowDirectory √
             MakeDir makeDir = new MakeDir();
-            SparrowDirectory directory = makeDir.mkFile("新建文件夹");
-            FileCatalog fileCatalog = new FileCatalog();
-            fileCatalog.setExtensionName(FileTypeEnum.DIR_LABEL.getCode());
-            String name = "新建文件夹";
-            if (newNum>0){
-                name+=String.valueOf(newNum);
-                newNum++;
-            }else{
-                newNum++;
-            }
-            fileCatalog.setCatalogName(name);
-            fileCatalog.setFileLength(SizeEnum.BLANK_FILE_SIZE.getCode());
-            directory.setFileCatalog(fileCatalog);
-            directory.setData(new ArrayList<>());
-            directory.setSize(fileCatalog.getFileLength());
-            //以上都是要删除的数据,真实数据需要后台给个SparrowDirectory;
-
+            SparrowDirectory directory = makeDir.mkFile("新建文件夹"+String.valueOf(newNum));
             Label label = loadDirsIconLabel(directory);
             document_FlowPane.getChildren().add(label);
             refreshFileTree();
@@ -235,24 +221,10 @@ public class FileManagerController implements Initializable {
             CreateFile createFile = new CreateFile();
             SparrowFile file = null;
             try {
-                file = createFile.createFile("新建文件");
+                file = createFile.createFile("新建文件"+String.valueOf(newNum));
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            FileCatalog fileCatalog = new FileCatalog();
-            fileCatalog.setExtensionName(FileTypeEnum.TXT_FILE.getCode());
-            String name = "新建文本文件";
-            if (newNum>0){
-                name+=String.valueOf(newNum);
-                newNum++;
-            }else{
-                newNum++;
-            }
-            fileCatalog.setCatalogName(name);
-            fileCatalog.setFileLength(SizeEnum.BLANK_FILE_SIZE.getCode());
-            file.setFileCatalog(fileCatalog);
-            file.setData("");
-            file.setSize(fileCatalog.getFileLength());
 
             Label label = loadDocIconLabel(file,"resource/icon/txt.png");
             document_FlowPane.getChildren().add(label);
@@ -285,8 +257,12 @@ public class FileManagerController implements Initializable {
         return_Label.setOnMouseClicked(event -> {
             tempHistoryDir = CurrentDirCatalog.getCurrentDir();
             CurrentDirCatalog.setCurrentDir(CurrentDirCatalog.getFatherDir());
+            System.out.println(CurrentDirCatalog.getCurrentDir().getFileCatalog().getCatalogName());
+            System.out.println("个数 "+CurrentDirCatalog.getCurrentDir().getData().size());
             document_FlowPane.getChildren().clear();
+            System.out.println(document_FlowPane.getChildren().size());
             showDocumentIcon(CurrentDirCatalog.getCurrentDir());
+            refreshPath();
         });
 
 
@@ -302,6 +278,7 @@ public class FileManagerController implements Initializable {
                 CurrentDirCatalog.setCurrentDir(tempHistoryDir);
                 document_FlowPane.getChildren().clear();
                 showDocumentIcon(CurrentDirCatalog.getCurrentDir());
+                refreshPath();
             }
         });
 
@@ -479,11 +456,8 @@ public class FileManagerController implements Initializable {
             //左键单击
             if (event.getButton() == MouseButton.PRIMARY){
                 CurrentDirCatalog.setCurrentDir((SparrowDirectory)document_i);
-<<<<<<< HEAD
                 System.out.println(document_i.getFileCatalog().getCatalogName());
-=======
                 refreshPath();
->>>>>>> 5db693c459741b2fa29a3d987420bfe8140c7e72
                 document_FlowPane.getChildren().clear();
                 showDocumentIcon((SparrowDirectory)document_i);
             }else if (event.getButton()==MouseButton.SECONDARY ){
@@ -544,13 +518,13 @@ public class FileManagerController implements Initializable {
                 return;
             }
 
-            //TODO 把文件粘贴到该目录下 √
+            //TODO 把文件粘贴到该目录下 
             CopyFile copyFile = new CopyFile();
             List<Document> data = doc.getData();
             data.add(clipboard);
             doc.setData(data);
             copyFile.pasteDir2Dir(doc);
-            //TODO 把这个文件装进硬盘 √
+            //TODO 把这个文件装进硬盘
 
             System.out.println(clipboard.toString()+"完成粘贴");
             refreshFileTree();
@@ -578,16 +552,13 @@ public class FileManagerController implements Initializable {
                     document.getFileCatalog().setCatalogName(curCatalog+"/"+newFileName);
                     attribute_TextField.setText(newFileName);
 
-<<<<<<< HEAD
                     //TODO 重命名后保存至硬盘,并刷新显示 √
                     FileTool.renameFile(document);
                     document_FlowPane.getChildren().clear();
-                    showDocumentIcon(sparrowDirectory);//刷新了一下
-=======
+                    showDocumentIcon(CurrentDirCatalog.getCurrentDir());//刷新了一下
                     //TODO 重命名后保存至硬盘,并刷新显示
                     refreshFlowPaneDisplay();
                     refreshFileTree();
->>>>>>> 5db693c459741b2fa29a3d987420bfe8140c7e72
                 }
             });
             showAttributeWindow(document);
@@ -622,6 +593,8 @@ public class FileManagerController implements Initializable {
             }
             SparrowDirectory currentDir = CurrentDirCatalog.getCurrentDir();
             List<Document> data = currentDir.getData();
+            //TODO 接收clipboard.data,返回一个可用的Document(接口的意思)然后才放下去
+
             data.add(clipboard);
             currentDir.setData(data);
             //TODO 装载回去,即将currentDir写回硬盘 √
@@ -641,7 +614,7 @@ public class FileManagerController implements Initializable {
             String[] splits = doc.getFileCatalog().getCatalogName().split("/");
             leaf = new TreeItem<>(splits[splits.length-1]);
         }else if(doc instanceof SparrowDirectory){
-            leaf = new TreeItem<>(doc.getFileCatalog().getCatalogName());
+            leaf = new TreeItem<>(FileTool.getEndFileName(doc.getFileCatalog().getCatalogName()));
             List<Document> data =  ((SparrowDirectory) doc).getData();
             for (Document document:data
                  ) {
@@ -899,6 +872,9 @@ public class FileManagerController implements Initializable {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(textArea.getText());
             txtFile.setData(stringBuilder.toString());
+            FileCatalog fileCatalog =txtFile.getFileCatalog();
+            fileCatalog.setFileLength(stringBuilder.toString().length());
+            txtFile.setFileCatalog(fileCatalog);
             //TODO 保存至硬盘 √
             WriteFile writeFile = new WriteFile();
             writeFile.writeFile(txtFile);

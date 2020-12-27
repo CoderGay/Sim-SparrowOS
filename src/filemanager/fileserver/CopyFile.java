@@ -38,7 +38,7 @@ public class CopyFile implements FileServer {
         FileTool.pasteDir2Directory(sparrowDirectory);
     }
 
-    public void pasteFile2CurDir(){
+    public void pasteFile2CurDir(SparrowFile sparrowFile){
         //更新当前目录
         SparrowDirectory sparrowDirectory = CurrentDirCatalog.getCurrentDir();
         List<Document>documentList = sparrowDirectory.getData();

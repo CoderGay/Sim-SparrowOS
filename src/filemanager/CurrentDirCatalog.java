@@ -37,11 +37,17 @@ public class CurrentDirCatalog{
         System.out.println(f.getFileCatalog().getCatalogName());
         currentDir=f;
         FileCatalog fileCatalog = f.getFileCatalog();
-        String[] strings = ("/"+fileCatalog.getCatalogName()).split("/");
-        System.out.println("The File Path is : /"+ fileCatalog.getCatalogName());
+        String[] strings = (fileCatalog.getCatalogName()).split("/");
+        System.out.println("The File Path is : "+ fileCatalog.getCatalogName());
+        /*System.out.println("strings.length: "+strings.length);
+        if (strings.length>0)
+        for (int i = 0; i < strings.length; i++) {
+            System.out.println("string["+i+"] = "+strings[i]);
+        }*/
 
         if (strings.length>2){
             String fatherPath = fileCatalog.getCatalogName().substring(0, fileCatalog.getCatalogName().length()- strings[strings.length-1].length()-1);
+            System.out.println("fatherPath: "+fatherPath);
             FileCatalog fatherFileCatalog = FileTool.getFile(fatherPath);
 
             SparrowDirectory sparrowDirectory = FileTool.getSparrowDirectory(fatherFileCatalog);
