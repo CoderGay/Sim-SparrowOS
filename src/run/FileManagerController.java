@@ -217,6 +217,9 @@ public class FileManagerController implements Initializable {
 
             Label label = loadDirsIconLabel(directory);
             document_FlowPane.getChildren().add(label);
+            refreshFileTree();
+            refreshDiskBlockTable();
+            refreshFlowPaneDisplay();
         });
 
         newFileMenuItem.setOnAction(event -> {
@@ -239,6 +242,9 @@ public class FileManagerController implements Initializable {
 
             Label label = loadDocIconLabel(file,"resource/icon/txt.png");
             document_FlowPane.getChildren().add(label);
+            refreshFileTree();
+            refreshDiskBlockTable();
+            refreshFlowPaneDisplay();
         });
         Menu newMenu = new Menu("新建");
         newMenu.getItems().addAll(newDirsMenuItem,newFileMenuItem);
@@ -526,6 +532,8 @@ public class FileManagerController implements Initializable {
             doc.setData(data);
             //TODO 把这个文件装进硬盘
             System.out.println(clipboard.toString()+"完成粘贴");
+            refreshFileTree();
+            refreshDiskBlockTable();
         });
     }
     private void failedPasteMenuItem(){
@@ -550,8 +558,8 @@ public class FileManagerController implements Initializable {
                     attribute_TextField.setText(newFileName);
 
                     //TODO 重命名后保存至硬盘,并刷新显示
-                    document_FlowPane.getChildren().clear();
-                    showDocumentIcon(sparrowDirectory);//刷新了一下
+                    refreshFlowPaneDisplay();
+                    refreshFileTree();
                 }
             });
             showAttributeWindow(document);
@@ -567,6 +575,9 @@ public class FileManagerController implements Initializable {
 
             //刷新
             System.out.println("已成功删除"+doc.toString());
+            refreshFlowPaneDisplay();
+            refreshFileTree();
+            refreshDiskBlockTable();
             /*document_FlowPane.getChildren().clear();
             showDocumentIcon(CurrentDirCatalog.getCurrentDir());*/
         });
@@ -587,6 +598,9 @@ public class FileManagerController implements Initializable {
             currentDir.setData(data);
             //TODO 装载回去,即将currentDir写回硬盘;
             System.out.println(clipboard+"粘贴成功");
+            refreshFlowPaneDisplay();
+            refreshDiskBlockTable();
+            refreshFileTree();
         });
     }
 
