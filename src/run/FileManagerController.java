@@ -225,6 +225,9 @@ public class FileManagerController implements Initializable {
 
             Label label = loadDirsIconLabel(directory);
             document_FlowPane.getChildren().add(label);
+            refreshFileTree();
+            refreshDiskBlockTable();
+            refreshFlowPaneDisplay();
         });
 
         newFileMenuItem.setOnAction(event -> {
@@ -253,6 +256,9 @@ public class FileManagerController implements Initializable {
 
             Label label = loadDocIconLabel(file,"resource/icon/txt.png");
             document_FlowPane.getChildren().add(label);
+            refreshFileTree();
+            refreshDiskBlockTable();
+            refreshFlowPaneDisplay();
         });
         Menu newMenu = new Menu("新建");
         newMenu.getItems().addAll(newDirsMenuItem,newFileMenuItem);
@@ -472,9 +478,12 @@ public class FileManagerController implements Initializable {
         dirsLabel.setOnMouseClicked(event-> {
             //左键单击
             if (event.getButton() == MouseButton.PRIMARY){
-                refreshPath();
                 CurrentDirCatalog.setCurrentDir((SparrowDirectory)document_i);
+<<<<<<< HEAD
                 System.out.println(document_i.getFileCatalog().getCatalogName());
+=======
+                refreshPath();
+>>>>>>> 5db693c459741b2fa29a3d987420bfe8140c7e72
                 document_FlowPane.getChildren().clear();
                 showDocumentIcon((SparrowDirectory)document_i);
             }else if (event.getButton()==MouseButton.SECONDARY ){
@@ -544,6 +553,8 @@ public class FileManagerController implements Initializable {
             //TODO 把这个文件装进硬盘 √
 
             System.out.println(clipboard.toString()+"完成粘贴");
+            refreshFileTree();
+            refreshDiskBlockTable();
         });
     }
     private void failedPasteMenuItem(){
@@ -567,10 +578,16 @@ public class FileManagerController implements Initializable {
                     document.getFileCatalog().setCatalogName(curCatalog+"/"+newFileName);
                     attribute_TextField.setText(newFileName);
 
+<<<<<<< HEAD
                     //TODO 重命名后保存至硬盘,并刷新显示 √
                     FileTool.renameFile(document);
                     document_FlowPane.getChildren().clear();
                     showDocumentIcon(sparrowDirectory);//刷新了一下
+=======
+                    //TODO 重命名后保存至硬盘,并刷新显示
+                    refreshFlowPaneDisplay();
+                    refreshFileTree();
+>>>>>>> 5db693c459741b2fa29a3d987420bfe8140c7e72
                 }
             });
             showAttributeWindow(document);
@@ -586,6 +603,9 @@ public class FileManagerController implements Initializable {
             new DeleteFile().deleteFile(doc);
             //刷新
             System.out.println("已成功删除"+doc.toString());
+            refreshFlowPaneDisplay();
+            refreshFileTree();
+            refreshDiskBlockTable();
             /*document_FlowPane.getChildren().clear();
             showDocumentIcon(CurrentDirCatalog.getCurrentDir());*/
         });
@@ -606,6 +626,9 @@ public class FileManagerController implements Initializable {
             currentDir.setData(data);
             //TODO 装载回去,即将currentDir写回硬盘 √
             System.out.println(clipboard+"粘贴成功");
+            refreshFlowPaneDisplay();
+            refreshDiskBlockTable();
+            refreshFileTree();
         });
     }
 
@@ -949,6 +972,7 @@ public class FileManagerController implements Initializable {
         /**
          * 装载数据
          * */
+        disk_TableView.getItems().clear();
         disk_TableView.setItems(targetData);
         /**
          * 装载列
@@ -966,4 +990,30 @@ public class FileManagerController implements Initializable {
         strBuilder.append("\n所占盘块号："+FileTool.getOccupiedDiskBlockNum(document));
         file_Tooltip.setText(strBuilder.toString());
     }
+
+    /**
+     * 刷新当前面板
+     * */
+    private void refreshFlowPaneDisplay(){
+        document_FlowPane.getChildren().clear();
+        showDocumentIcon(CurrentDirCatalog.getCurrentDir());
+    }
+
+    /**
+     * 刷新当前目录树
+     * */
+    private void refreshFileTree(){
+        rootNode.getChildren().clear();
+        showTree();
+    }
+
+    /**
+     * 刷新磁盘块显示表
+     * */
+    private void refreshDiskBlockTable(){
+        loadDiskTableView();
+    }
+
+
+
 }
