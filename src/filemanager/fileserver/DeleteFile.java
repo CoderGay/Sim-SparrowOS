@@ -1,6 +1,14 @@
 package filemanager.fileserver;
 
+import filemanager.CurrentDirCatalog;
+import filemanager.FileCatalog;
 import filemanager.FileServer;
+import filemanager.file.Document;
+import filemanager.file.SparrowDirectory;
+import filemanager.file.SparrowFile;
+import tools.FileTool;
+
+import java.util.List;
 
 /**
  * @author WenZhikun
@@ -11,6 +19,20 @@ public class DeleteFile implements FileServer {
 
     @Override
     public void operation(String instruction) {
-        //TODO 删除文件
+        /**
+        instruction = instruction.toLowerCase();
+        if (!instruction.startsWith("delete ")||!instruction.contains(".")){
+            System.out.println("Can not found the instruction :"+instruction);
+            return ;
+        }
+
+        String filepath = instruction.trim().substring(6,instruction.length());
+
+        FileCatalog fileCatalog = FileTool.getExistFile(filepath);*/
+    }
+
+    public void deleteFile(Document document){
+
+        FileTool.deleteFilefromDir(document);
     }
 }

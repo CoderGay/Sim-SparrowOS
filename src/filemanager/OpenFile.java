@@ -1,8 +1,10 @@
 package filemanager;
 
 import enums.FileTypeEnum;
+import filemanager.file.SparrowFile;
 import tools.FileTool;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,9 +31,12 @@ public class OpenFile {
         return openFile;
     }
 
-    public boolean openAFile(String fileName,int operationType){
+    public boolean openAFile(SparrowFile sparrowFile,int operationType){
+        /**
         String []dirs = fileName.split("\\\\");
-        FileCatalog fileCatalog = FileTool.isExist(fileName);
+        FileCatalog fileCatalog = FileTool.getExistFile(fileName);
+         **/
+        FileCatalog fileCatalog = sparrowFile.getFileCatalog();
         int[] operate = new int[4];
         for (int i=3;i>=0;i--){
             operate[i] = operationType%10;
@@ -51,6 +56,18 @@ public class OpenFile {
         }else{
             return false;
         }
+        return false;
+    }
+
+    //关闭已经打开的文件
+    public boolean closeFile(SparrowFile sparrowFile){
+        for (int i = 0; i < openedFileList.size(); i++) {
+            if (openedFileList.get(i)== sparrowFile.getFileCatalog()){
+                openedFileList.remove(i);
+                return true;
+            }
+        }
+        System.out.println("[not found]文件未打开 ");
         return false;
     }
 

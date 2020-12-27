@@ -7,9 +7,14 @@ import equipment.Disk;
 import equipment.DiskBlock;
 import filemanager.CurrentDirCatalog;
 import filemanager.FileCatalog;
+import filemanager.WriteFile;
 import filemanager.file.Document;
 import filemanager.file.SparrowDirectory;
 import filemanager.file.SparrowFile;
+import filemanager.fileserver.CopyFile;
+import filemanager.fileserver.CreateFile;
+import filemanager.fileserver.DeleteFile;
+import filemanager.fileserver.MakeDir;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,8 +38,10 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import sun.security.util.Cache;
 import tools.FileTool;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,50 +101,50 @@ public class FileManagerController implements Initializable {
          * 测试数据,待会要删掉哈
          * */
 
-        List<Document> documentList = new ArrayList<>();
-        for (int i = 0; i <10; i++) {
-            SparrowDirectory directory1 = new SparrowDirectory();
-            FileCatalog catalog = new FileCatalog();
-            catalog.setCatalogName("子目录"+String.valueOf(i+1));
-            directory1.setFileCatalog(catalog);
-            ArrayList<Document> list = new ArrayList<>();
-            for (int j = 0; j < 10; j++) {
-                SparrowDirectory directory3 = new SparrowDirectory();
-                FileCatalog catalog3 = new FileCatalog();
-                catalog3.setCatalogName("子目录"+String.valueOf(i+1));
-                directory3.setFileCatalog(catalog);
-                directory3.setData(new ArrayList<>());
-                list.add(directory3);
-            }
-            directory1.setData(list);
-            documentList.add(directory1);
-        }
-
-        SparrowFile file = new SparrowFile();
-        FileCatalog catalog = new FileCatalog();
-        catalog.setCatalogName("a.exe");
-        catalog.setExtensionName(1);
-        file.setFileCatalog(catalog);
-        documentList.add(file);
-
-        SparrowFile file1 = new SparrowFile();
-        FileCatalog catalog1 = new FileCatalog();
-        catalog1.setCatalogName("ab.txt");
-        catalog1.setExtensionName(2);
-        file1.setFileCatalog(catalog1);
-        documentList.add(file1);
-
-        SparrowFile file2 = new SparrowFile();
-        FileCatalog catalog2 = new FileCatalog();
-        catalog2.setCatalogName("abc.word");
-        catalog2.setExtensionName(3);
-        file2.setFileCatalog(catalog2);
-        documentList.add(file2);
-
-        FileCatalog fileCatalog = new FileCatalog();
-        fileCatalog.setCatalogName("/根目录");
-        sparrowDirectory.setFileCatalog(fileCatalog);
-        sparrowDirectory.setData(documentList);
+//        List<Document> documentList = new ArrayList<>();
+//        for (int i = 0; i <10; i++) {
+//            SparrowDirectory directory1 = new SparrowDirectory();
+//            FileCatalog catalog = new FileCatalog();
+//            catalog.setCatalogName("\\子目录"+String.valueOf(i+1));
+//            directory1.setFileCatalog(catalog);
+//            ArrayList<Document> list = new ArrayList<>();
+//            for (int j = 0; j < 10; j++) {
+//                SparrowDirectory directory3 = new SparrowDirectory();
+//                FileCatalog catalog3 = new FileCatalog();
+//                catalog3.setCatalogName("\\子目录"+String.valueOf(i+1));
+//                directory3.setFileCatalog(catalog);
+//                directory3.setData(new ArrayList<>());
+//                list.add(directory3);
+//            }
+//            directory1.setData(list);
+//            documentList.add(directory1);
+//        }
+//
+//        SparrowFile file = new SparrowFile();
+//        FileCatalog catalog = new FileCatalog();
+//        catalog.setCatalogName("\\a.exe");
+//        catalog.setExtensionName(1);
+//        file.setFileCatalog(catalog);
+//        documentList.add(file);
+//
+//        SparrowFile file1 = new SparrowFile();
+//        FileCatalog catalog1 = new FileCatalog();
+//        catalog1.setCatalogName("\\ab.txt");
+//        catalog1.setExtensionName(2);
+//        file1.setFileCatalog(catalog1);
+//        documentList.add(file1);
+//
+//        SparrowFile file2 = new SparrowFile();
+//        FileCatalog catalog2 = new FileCatalog();
+//        catalog2.setCatalogName("\\abc.word");
+//        catalog2.setExtensionName(3);
+//        file2.setFileCatalog(catalog2);
+//        documentList.add(file2);
+//
+//        FileCatalog fileCatalog = new FileCatalog();
+//        fileCatalog.setCatalogName("\\根目录");
+//        sparrowDirectory.setFileCatalog(fileCatalog);
+//        sparrowDirectory.setData(documentList);
         /**
          * 测试数据装填完毕
          * */
@@ -197,8 +204,9 @@ public class FileManagerController implements Initializable {
         MenuItem newFileMenuItem =  new MenuItem("新建文本文件");
         MenuItem newDirsMenuItem =  new MenuItem("新建文件夹");
         newDirsMenuItem.setOnAction(event -> {
-            //TODO 创建文件夹应该返回一个在物理层面创建成功的SparrowDirectory
-            SparrowDirectory directory = new SparrowDirectory();
+            //TODO 创建文件夹应该返回一个在物理层面创建成功的SparrowDirectory √
+            MakeDir makeDir = new MakeDir();
+            SparrowDirectory directory = makeDir.mkFile("新建文件夹");
             FileCatalog fileCatalog = new FileCatalog();
             fileCatalog.setExtensionName(FileTypeEnum.DIR_LABEL.getCode());
             String name = "新建文件夹";
@@ -220,8 +228,14 @@ public class FileManagerController implements Initializable {
         });
 
         newFileMenuItem.setOnAction(event -> {
-            //TODO 创建文本文件应该返回一个在物理层面创建成功的SparrowFile
-            SparrowFile file = new SparrowFile();
+            //TODO 创建文本文件应该返回一个在物理层面创建成功的SparrowFile √
+            CreateFile createFile = new CreateFile();
+            SparrowFile file = null;
+            try {
+                file = createFile.createFile("新建文件");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             FileCatalog fileCatalog = new FileCatalog();
             fileCatalog.setExtensionName(FileTypeEnum.TXT_FILE.getCode());
             String name = "新建文本文件";
@@ -460,6 +474,7 @@ public class FileManagerController implements Initializable {
             if (event.getButton() == MouseButton.PRIMARY){
                 refreshPath();
                 CurrentDirCatalog.setCurrentDir((SparrowDirectory)document_i);
+                System.out.println(document_i.getFileCatalog().getCatalogName());
                 document_FlowPane.getChildren().clear();
                 showDocumentIcon((SparrowDirectory)document_i);
             }else if (event.getButton()==MouseButton.SECONDARY ){
@@ -520,11 +535,14 @@ public class FileManagerController implements Initializable {
                 return;
             }
 
-            //TODO 把文件粘贴到该目录下
+            //TODO 把文件粘贴到该目录下 √
+            CopyFile copyFile = new CopyFile();
             List<Document> data = doc.getData();
             data.add(clipboard);
             doc.setData(data);
-            //TODO 把这个文件装进硬盘
+            copyFile.pasteDir2Dir(doc);
+            //TODO 把这个文件装进硬盘 √
+
             System.out.println(clipboard.toString()+"完成粘贴");
         });
     }
@@ -549,7 +567,8 @@ public class FileManagerController implements Initializable {
                     document.getFileCatalog().setCatalogName(curCatalog+"/"+newFileName);
                     attribute_TextField.setText(newFileName);
 
-                    //TODO 重命名后保存至硬盘,并刷新显示
+                    //TODO 重命名后保存至硬盘,并刷新显示 √
+                    FileTool.renameFile(document);
                     document_FlowPane.getChildren().clear();
                     showDocumentIcon(sparrowDirectory);//刷新了一下
                 }
@@ -563,8 +582,8 @@ public class FileManagerController implements Initializable {
      * */
     private void setDeleteMenuItem(Document doc){
         deleteMenuItem.setOnAction(event -> {
-            //TODO 删除doc文件并刷新
-
+            //TODO 删除doc文件并刷新 √
+            new DeleteFile().deleteFile(doc);
             //刷新
             System.out.println("已成功删除"+doc.toString());
             /*document_FlowPane.getChildren().clear();
@@ -585,7 +604,7 @@ public class FileManagerController implements Initializable {
             List<Document> data = currentDir.getData();
             data.add(clipboard);
             currentDir.setData(data);
-            //TODO 装载回去,即将currentDir写回硬盘;
+            //TODO 装载回去,即将currentDir写回硬盘 √
             System.out.println(clipboard+"粘贴成功");
         });
     }
@@ -853,11 +872,14 @@ public class FileManagerController implements Initializable {
      * */
     private void setSaveMenuItem(SparrowFile txtFile){
         saveMenuItem.setOnAction(event -> {
-            //TODO 保存
+            //TODO 保存 √
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(textArea.getText());
             txtFile.setData(stringBuilder.toString());
-            //TODO 保存至硬盘
+            //TODO 保存至硬盘 √
+            WriteFile writeFile = new WriteFile();
+            writeFile.writeFile(txtFile);
+
             String fileName = FileTool.getEndFileName(txtFile.getFileCatalog().getCatalogName());
             System.out.println("已保存："+txtFile.getData()+"至"+fileName);
 

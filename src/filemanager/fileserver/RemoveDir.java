@@ -1,6 +1,8 @@
 package filemanager.fileserver;
 
 import filemanager.FileServer;
+import filemanager.file.SparrowDirectory;
+import tools.FileTool;
 
 /**
  * @author WenZhikun
@@ -12,6 +14,11 @@ public class RemoveDir implements FileServer {
 
     @Override
     public void operation(String instruction) {
-        //TODO 删除目录
+        //命令行操作
     }
+
+    public static void deleteDir(SparrowDirectory sparrowDirectory){
+        FileTool.deleteDirFromDir(sparrowDirectory);
+    }
+
 }

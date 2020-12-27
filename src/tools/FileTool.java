@@ -1,5 +1,6 @@
 package tools;
 
+import com.sun.glass.ui.Size;
 import enums.FileTypeEnum;
 import enums.SizeEnum;
 import equipment.DiskBlock;
@@ -25,15 +26,18 @@ import java.util.List;
  */
 public class FileTool {
 
-    public static FileCatalog isExist(String fileName){
-        String []dirs = fileName.split("\\\\");
+    /**
+     * "./"：代表目前所在的路径
+     * "../"：代表上一层路径
+     * "/"开头，代表根目录
+     * */
+
+    /**
+    public static FileCatalog getExistFile(String fileName){
+        System.out.println("getExitFile filename = "+fileName);
+        String []dirs = fileName.split("/");
         Disk disk = Disk.getDisk();
 
-        /**
-        * "./"：代表目前所在的路径
-        * "../"：代表上一层路径
-        * "/"开头，代表根目录
-        * */
         if (dirs[0].equals(".")||dirs[0].equals("..")){
             if(dirs[0].equals(".")){
                 System.out.println("判断相对路径下文件是否存在");
@@ -63,7 +67,7 @@ public class FileTool {
     //绝对路径判断文件是否存在
     private static FileCatalog hasAbsolutePath(String absolutePath){
         //对文件目录进行划分
-        String[] allPath = absolutePath.split("\\\\");
+        String[] allPath = absolutePath.split("/");
         //获取根节点中的目录列表
         return hasFile(allPath,Disk.getDisk().getRoot());
     }
@@ -71,7 +75,7 @@ public class FileTool {
     //判断相对路径下是否存在文件
     public static FileCatalog hasRelativePath(String filePath){
         SparrowDirectory currentDir = CurrentDirCatalog.getCurrentDir();
-        String[] relativePath = filePath.split("\\\\");
+        String[] relativePath = filePath.split("/");
         return hasFile(relativePath,currentDir);
     }
 
@@ -79,9 +83,12 @@ public class FileTool {
         FileCatalog resultFileCatalog = null;
         List<Document> directoryData = directory.getData();
         int index = 1;
+        if (path.length==1)
+            return Disk.getDisk().getRoot().getFileCatalog();
         while(true){
             for (Document d:directoryData
             ) {
+                System.out.println(path.length);
                 if (path[index].equals(d.getFileCatalog().getCatalogName())){
                     if (d.getFileCatalog().getExtensionName()==0){
                         //如果当前目录结点代表的是目录，且目录名字匹配，则继续向下查找
@@ -110,6 +117,43 @@ public class FileTool {
                 }
             }
         }
+    }*/
+
+    //根据路径查找文件
+    public static FileCatalog getFile(String filePath){
+        System.out.println("Find File is "+filePath);
+
+        String[] paths = filePath.split("/");
+
+        if (paths.length==1){
+            return Disk.getDisk().getRoot().getFileCatalog();
+        }
+
+        Disk disk = Disk.getDisk();
+        SparrowDirectory root = disk.getRoot();
+        List<Document>documentList = root.getData();
+
+        int index=1;
+        int j=0;
+        while (j<documentList.size()){
+            System.out.println(documentList.size() + ": "+FileTool.getEndFileName(documentList.get(j).getFileCatalog().getCatalogName()));
+            System.out.println(paths[index]);
+            if (FileTool.getEndFileName(documentList.get(j).getFileCatalog().getCatalogName()).equals(paths[index])){
+                System.out.println(documentList.get(j).getFileCatalog().toString());
+                if (index==paths.length-1){
+                    System.out.println("success found !");
+                    return documentList.get(index).getFileCatalog();
+                }else{
+                    j=0;
+                    index++;
+                    documentList = ((SparrowDirectory)documentList.get(j)).getData();
+                    //System.out.println("i = "+ index);
+                }
+            }else {
+                j++;
+            }
+        }
+        return null;
     }
 
 
@@ -180,14 +224,21 @@ public class FileTool {
         int strStartIndex = 0;
         //子目录中含有的目录项结点的个数
         List<Document>allData = directory.getData();
+        //System.out.println("divide : "+ divided);
+        //System.out.println("allData length is "+ allData.size());
         int length = allData.size()-1;
         //System.out.println(length);
-        for (int i = 0; i < divided+1; i++) {
+        if (allData.size()%8!=0){
+            divided++;
+        }
+        int i=0;
+        while (i<divided){
+
             SparrowDirectory apartDirectory = new SparrowDirectory();
             apartDirectory.setFileCatalog(directory.getFileCatalog());
             List<Document> subDataList = new ArrayList<>();
             for (int j=strStartIndex;j<strStartIndex+8;j++){
-                //System.out.println(j);
+
                 subDataList.add(allData.get(j));
                 if (j==length)
                     break;
@@ -196,6 +247,7 @@ public class FileTool {
             apartDirectory.setSize(apartDirectory.getData().size()*SizeEnum.BLOCKS_DIR_SIZE.getCode());
             resultDirectory.add(apartDirectory);
             strStartIndex+=SizeEnum.BLOCKS_DIR_SIZE.getCode();
+            i++;
         }
         return resultDirectory;
     }
@@ -222,6 +274,10 @@ public class FileTool {
 
     //通过目录结点获取目录&&合并目录
     public static SparrowDirectory getSparrowDirectory(FileCatalog fileCatalog){
+        if (fileCatalog==null){
+            System.out.println("结点为空！");
+            return null;
+        }
         List<DiskBlock>diskBlocks=Disk.getDisk().getGivenDiskBlocks(fileCatalog);
         if (diskBlocks.size()==1){
             System.out.println("[合并失败]该目录仅占用一个盘块");
@@ -242,6 +298,147 @@ public class FileTool {
         }
         resultDirectory.setData(directoryData);
         return resultDirectory;
+    }
+
+    //添加文件到父目录中
+    public static void addFile2Directory(SparrowFile sparrowFile){
+        //添加到父目录的结点中
+        SparrowDirectory fatherDirectory = CurrentDirCatalog.getCurrentDir();
+        List<Document>documents = fatherDirectory.getData();
+        //System.out.println("addFile2Dir length0 : "  + fatherDirectory.getData().size());
+        documents.add(sparrowFile);
+        fatherDirectory.setData(documents);
+        fatherDirectory.setSize(8*documents.size());
+        FileCatalog fileCatalog = fatherDirectory.getFileCatalog();
+        fileCatalog.setFileLength(fatherDirectory.getSize());
+        fatherDirectory.setFileCatalog(fileCatalog);
+
+        FileTool.updateDocument(fatherDirectory);
+
+        //System.out.println("文件添加成功");
+        //更新当前文件夹
+        CurrentDirCatalog.setCurrentDir(fatherDirectory);
+    }
+
+    //添加文件夹到父目录中
+    public static void addDir2Directory(SparrowDirectory sparrowDirectory){
+        //添加到父目录的结点中
+        SparrowDirectory fatherDirectory = CurrentDirCatalog.getCurrentDir();
+        List<Document>documents = fatherDirectory.getData();
+        documents.add(sparrowDirectory);
+        fatherDirectory.setData(documents);
+        fatherDirectory.setSize(8*documents.size());
+        FileCatalog fileCatalog = fatherDirectory.getFileCatalog();
+        fileCatalog.setFileLength(fatherDirectory.getSize());
+        fatherDirectory.setFileCatalog(fileCatalog);
+        //更新文件夹盘块
+        FileTool.updateDocument(fatherDirectory);
+        //System.out.println("文件夹添加成功");
+        //更新当前文件夹
+        CurrentDirCatalog.setCurrentDir(fatherDirectory);
+    }
+
+    public static void pasteDir2Directory(SparrowDirectory sparrowDirectory){
+        //添加到父目录的结点中
+        SparrowDirectory fatherDirectory = CurrentDirCatalog.getCurrentDir();
+        List<Document>documents = fatherDirectory.getData();
+        //进行覆盖
+        for (int i = 0; i < documents.size(); i++) {
+            if (documents.get(i).getFileCatalog().getCatalogName() == sparrowDirectory.getFileCatalog().getCatalogName()){
+                if (documents.get(i).getFileCatalog().getExtensionName()==FileTypeEnum.DIR_LABEL.getCode()){
+                    deleteDirFromDir((SparrowDirectory)documents.get(i));
+                    addDir2Directory(sparrowDirectory);
+                    System.out.println("粘贴成功！");
+                    return;
+                }
+                break;
+            }
+        }
+        System.out.println("粘贴失败！");
+    }
+
+    //从文件夹中删除文件
+    public static void deleteFilefromDir(Document document){
+        SparrowDirectory sparrowDirectory = CurrentDirCatalog.getCurrentDir();
+        FileCatalog fileCatalog = document.getFileCatalog();
+        List<Document>documentList=sparrowDirectory.getData();
+        //System.out.println("size of document is "+documentList.size());
+        for (int i=0;i<documentList.size();i++){
+            if (documentList.get(i).getFileCatalog().getCatalogName().equals(fileCatalog.getCatalogName())){
+                //System.out.println(documentList.get(i).getFileCatalog().toString());
+                documentList.remove(i);
+                //System.out.println("success find !");
+                break;
+            }
+        }
+
+        sparrowDirectory.setData(documentList);
+        //更新当前文件夹
+        updateDocument(sparrowDirectory);
+        CurrentDirCatalog.setCurrentDir(sparrowDirectory);
+        //回收所有占用的盘块
+        Disk.getDisk().fileRecycling(fileCatalog);
+        //System.out.println("size of sparrowDirectory is "+sparrowDirectory.getData().size());
+        Disk.output2DiskDocument(Disk.getDisk());
+        System.out.println("删除文件成功 ！");
+    }
+
+    //从文件夹中删除文件夹
+    public static void deleteDirFromDir(SparrowDirectory directory){
+        //1、从父目录中删除该文件目录项，并更新父目录(父目录就是当前目录)
+        //2、回收文件所占有的所有盘块
+        SparrowDirectory sparrowDirectory = CurrentDirCatalog.getCurrentDir();
+        FileCatalog fileCatalog = directory.getFileCatalog();
+        List<Document>documentList=sparrowDirectory.getData();
+        for (int i=0;i<documentList.size();i++){
+            if (documentList.get(i).getFileCatalog().getCatalogName().equals(fileCatalog.getCatalogName())){
+                documentList.remove(i);
+                break;
+            }
+        }
+        sparrowDirectory.setData(documentList);
+        //更新当前文件夹
+        updateDocument(sparrowDirectory);
+        CurrentDirCatalog.setCurrentDir(sparrowDirectory);
+        //回收文件夹下的所有盘块
+        recycleDirectory(directory);
+        Disk.output2DiskDocument(Disk.getDisk());
+        System.out.println("删除文件夹成功 ！");
+    }
+
+
+    //删除文件夹下的所有节点,递归
+    public static void recycleDirectory(SparrowDirectory sparrowDirectory){
+        List<Document>documents = sparrowDirectory.getData();
+
+        for (int i = 0; i < documents.size(); i++) {
+            if (documents.get(i).getFileCatalog().getExtensionName()==FileTypeEnum.DIR_LABEL.getCode()){
+                //如果依然是目录，则继续递归
+                //System.out.println("recycleDirectory loop dir!");
+                recycleDirectory((SparrowDirectory)documents.get(i));
+            }else{
+
+                Disk.getDisk().fileRecycling(documents.get(i).getFileCatalog());
+
+            }
+        }
+        //释放自己
+        //Disk.getDisk().fileRecycling(sparrowDirectory.getFileCatalog());
+    }
+
+
+    //文件夹进行增删之后进行更新
+    public static void updateDocument(SparrowDirectory sparrowDirectory){
+        Disk.getDisk().fileRecycling(sparrowDirectory.getFileCatalog());
+        Disk.getDisk().writeDirectory2Disk(sparrowDirectory);
+        return;
+    }
+
+    //更新文件
+    public static void updateFile(SparrowFile sparrowFile){
+        Disk.getDisk().fileRecycling(sparrowFile.getFileCatalog());
+        Disk.getDisk().writeFile2Disk(sparrowFile);
+        return;
     }
 
     public static String getEndFileName(String filePath){
@@ -281,5 +478,14 @@ public class FileTool {
                 stringBuilder.append(",");
         }
         return stringBuilder.toString();
+    }
+
+    public static void renameFile(Document document){
+        //判断是文件还是目录
+        if (document.getFileCatalog().getExtensionName()==FileTypeEnum.DIR_LABEL.getCode()){
+            updateDocument((SparrowDirectory) document);
+        }else{
+            updateFile((SparrowFile)document);
+        }
     }
 }

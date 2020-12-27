@@ -87,7 +87,7 @@ public class Disk implements Serializable,Device{
                 File diskFile = new File(diskName.split("/")[1]);
                 diskFile.mkdirs();
 
-//                diskBlockList = new ArrayList<>();
+                //diskBlockList = new ArrayList<>();
                 //写满256行
                 for (int i = 0; i < SizeEnum.DISK_SIZE.getCode(); i++) {
                     /**
@@ -110,13 +110,26 @@ public class Disk implements Serializable,Device{
         catch (IOException e){
             System.out.println(e.toString());
         }
+
+
     }
 
     //读取磁盘文件内容
-    private static Disk getDiskDocument(){
+    public static Disk getDiskDocument(){
         Disk disk =null;
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(diskName))) {
             disk = (Disk) ois.readObject();
+           // Disk disk = Disk.getDisk();
+            /*System.out.println("getDisk --------------------------------------------  : ");
+            System.out.print(" ");
+            for(int z=0;z<disk.getFileAllocateTable().length;z++){
+                System.out.print(z+"   ");
+            }
+            System.out.println();
+            for (int z:disk.getFileAllocateTable()
+            ) {
+                System.out.print(z + "  ");
+            }*/
         }catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }catch (ClassNotFoundException e){
@@ -128,7 +141,15 @@ public class Disk implements Serializable,Device{
     }
 
     //写入磁盘文件内容
-    private static void output2DiskDocument(Disk wholeDisk){
+    public static void output2DiskDocument(Disk wholeDisk){
+//        int label = 0;
+//        for (int i=0;i< wholeDisk.getFileAllocateTable().length;i++){
+//            if (wholeDisk.getFileAllocateTable()[i]==-1){
+//                label++;
+//            }
+//        }
+//        System.out.println("label : "+label);
+        //System.out.println("output length1 : "  + wholeDisk.getRoot().getData().size());
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(diskName))) {
             oos.writeObject(wholeDisk);
         } catch (FileNotFoundException e) {
@@ -146,11 +167,13 @@ public class Disk implements Serializable,Device{
         }else {
             int i=0;
             for (i =0;i<SizeEnum.DISK_SIZE.getCode();i++){
+                //System.out.println(i+" : "+fileAllocateTable[i]);
                 if (fileAllocateTable[i]==SizeEnum.AVAILABLE_BLOCKS.getCode())
                     break;
             }
             number = i;
         }
+        //System.out.println("available block is "+number);
         return number;
     }
 
@@ -163,23 +186,31 @@ public class Disk implements Serializable,Device{
             return 0;//返回零代表分配失败
         else if (fileCatalog.getExtensionName()==FileTypeEnum.DIR_LABEL.getCode()){
             //没有扩展名则表示不是文件是目录
+            //TODO 目录也需要分配盘块
             return 0;//返回零代表分配失败
         }
         /**
          * 首次适配 First Fit
          * */
-        //找到末尾的盘块号，再插入可用盘块
         int temp = fileCatalog.getStartIndex();
+
         while(fileAllocateTable[temp]!=SizeEnum.END_BLOCKS_LABEL.getCode()){
+
+            if (fileAllocateTable[temp]==0){
+                //表示是刚创建的空文件
+                break;
+            }
             temp = fileAllocateTable[temp];
         }
-        int i=0;
-        for (i =0;i<SizeEnum.DISK_SIZE.getCode();i++){
-            if (fileAllocateTable[i]==SizeEnum.AVAILABLE_BLOCKS.getCode())
-                break;
-        }
+        //System.out.println(temp);
+        int i=getFirstAvailableBlock();
+        System.out.println(i);
         fileAllocateTable[temp] = i;
+        //System.out.println("i : "+i);
         fileAllocateTable[i] = SizeEnum.END_BLOCKS_LABEL.getCode();
+//        for (int j = 0; j < fileAllocateTable.length; j++) {
+//            System.out.println(j +" " + fileAllocateTable[j]);
+//        }
         availableBlocks--;
         //更新文件长度
         fileCatalog.setFileLength(fileCatalog.getFileLength()+1);
@@ -189,26 +220,68 @@ public class Disk implements Serializable,Device{
     public boolean writeFile2Disk(SparrowFile data){
         FileCatalog fileCatalog = data.getFileCatalog();
         int blockIndex = 0;
+
         if(fileCatalog.getFileLength()<SizeEnum.BLOCKS_SIZE.getCode()){
             writeDisk(fileCatalog.getStartIndex(),data);
+
+            //System.out.println("w2d"+ fileCatalog.getStartIndex());
+            fileAllocateTable[fileCatalog.getStartIndex()] = -1;
         }else{
+            //System.out.println(data.getData());
             List<SparrowFile> blockFileList = FileTool.decomposeFile(data);
             blockIndex = fileCatalog.getStartIndex();
-            for (int i = 0; i <blockFileList.size(); i++) {
+            fileAllocateTable[blockIndex] = SizeEnum.END_BLOCKS_LABEL.getCode();
+            int newIndex = 0;
+            for (int i = 1; i <blockFileList.size(); i++) {
                 writeDisk(blockIndex, blockFileList.get(i));
                 //如果比文件原来的大则申请盘块空间;
-                if (fileAllocateTable[blockIndex]==SizeEnum.END_BLOCKS_LABEL.getCode()&&i<blockFileList.size()-1){
-                    blockIndex = fileAllocate(fileCatalog);
-                }
-
-                blockIndex = fileAllocateTable[blockIndex];
+                newIndex = Disk.getDisk().getFirstAvailableBlock();
+                //System.out.println("newIndex : "+ newIndex);
+                fileAllocateTable[blockIndex] = newIndex;
+                fileAllocateTable[newIndex] = SizeEnum.END_BLOCKS_LABEL.getCode();
+                blockIndex = newIndex;
             }
-            if (blockIndex!=SizeEnum.END_BLOCKS_LABEL.getCode()){
-                recyclingBlock(blockIndex);
-            }
+            //fileAllocateTable[blockIndex] = SizeEnum.END_BLOCKS_LABEL.getCode();
         }
 
         return false;
+    }
+
+    //将目录写入到磁盘中
+    public boolean writeDirectory2Disk(SparrowDirectory sparrowDirectory){
+        Disk disk = Disk.getDisk();
+        FileCatalog fileCatalog = sparrowDirectory.getFileCatalog();
+        if (sparrowDirectory.getData().size()<=8){
+            //目录项小于8，占用一个盘块
+            writeDisk(fileCatalog.getStartIndex(),sparrowDirectory);
+            //System.out.println("startIndex : "+fileCatalog.getStartIndex());
+            fileAllocateTable[fileCatalog.getStartIndex()]=-1;
+        }else{
+            //目录项大于8,需要进行拆分
+            List<SparrowDirectory>sparrowDirectories = FileTool.decomposeDirectory(sparrowDirectory);
+            int blockIndex = fileCatalog.getStartIndex();
+            fileAllocateTable[blockIndex] =SizeEnum.END_BLOCKS_LABEL.getCode();
+            writeDisk(blockIndex,sparrowDirectories.get(0));
+            int newIndex = 0;
+            //System.out.println("Disk.writeDirectory2Disk blockIndex "+blockIndex);
+            //System.out.println("sparrow Dir size is " + sparrowDirectories.size());
+            for (int i=1;i<sparrowDirectories.size();i++){
+                newIndex = disk.getFirstAvailableBlock();
+                //System.out.println("Disk.getDisk().getFirstAvailableBlock() : "+ Disk.getDisk().getFirstAvailableBlock());
+                //System.out.println("blockIndex :"+blockIndex);
+                //System.out.println("Disk.writeDirectory2Disk newIndex "+newIndex);
+                if (newIndex == SizeEnum.FILLED_DISK_LABEL.getCode()){
+                    System.out.println("[error]磁盘已满");
+                    return false;
+                }
+                //写入磁盘
+                writeDisk(newIndex,sparrowDirectories.get(i));
+                fileAllocateTable[blockIndex] = newIndex;
+                fileAllocateTable[newIndex] = SizeEnum.END_BLOCKS_LABEL.getCode();
+                blockIndex = newIndex;
+            }
+        }
+        return true;
     }
 
     public int recyclingBlock(int startIndex){
@@ -268,20 +341,21 @@ public class Disk implements Serializable,Device{
 
         int nextBlock  = fileCatalog.getStartIndex();
         int index = 0;
-
+        int fomerBlock = 0;
         while(nextBlock!=SizeEnum.END_BLOCKS_LABEL.getCode()&&nextBlock<SizeEnum.DISK_SIZE.getCode()){
-                resultDiskBlockList.add(diskBlockList.get(nextBlock));
-                nextBlock  = fileAllocateTable[nextBlock];
-                index++;
-                fileCatalog.setReadPointBlock(nextBlock);
-                fileCatalog.setReadPointIndex(index);
+            fomerBlock = nextBlock;
+            resultDiskBlockList.add(diskBlockList.get(nextBlock));
+            nextBlock  = fileAllocateTable[nextBlock];
+            index++;
+            fileCatalog.setReadPointBlock(nextBlock);
+            fileCatalog.setReadPointIndex(index);
         }
 
         /**
          * 读取到文件末端
          * */
         if (nextBlock==SizeEnum.END_BLOCKS_LABEL.getCode()){
-            resultDiskBlockList.add(diskBlockList.get(nextBlock));
+            resultDiskBlockList.add(diskBlockList.get(fomerBlock));
             return resultDiskBlockList;
         }
 

@@ -2,6 +2,9 @@ package filemanager;
 
 import equipment.Disk;
 import filemanager.file.SparrowDirectory;
+import tools.FileTool;
+
+import java.io.File;
 
 /**
  * @author WenZhikun
@@ -23,14 +26,29 @@ public class CurrentDirCatalog{
 
     public static SparrowDirectory getFatherDir(){
 
-        //TODO 没写的哈,根据目录树自动寻找到父节点
         if (fatherDir==null){
             fatherDir = currentDir;
         }
         return fatherDir;
     }
+
+    //自动设置父节点
     public static void setCurrentDir(SparrowDirectory f){
+        System.out.println(f.getFileCatalog().getCatalogName());
         currentDir=f;
+        FileCatalog fileCatalog = f.getFileCatalog();
+        String[] strings = ("/"+fileCatalog.getCatalogName()).split("/");
+        System.out.println("The File Path is : /"+ fileCatalog.getCatalogName());
+
+        if (strings.length>2){
+            String fatherPath = fileCatalog.getCatalogName().substring(0, fileCatalog.getCatalogName().length()- strings[strings.length-1].length()-1);
+            FileCatalog fatherFileCatalog = FileTool.getFile(fatherPath);
+
+            SparrowDirectory sparrowDirectory = FileTool.getSparrowDirectory(fatherFileCatalog);
+            setFatherDir(sparrowDirectory);
+        }else{
+            setFatherDir(Disk.getDisk().getRoot());
+        }
     }
 
     public static void setFatherDir(SparrowDirectory f){
