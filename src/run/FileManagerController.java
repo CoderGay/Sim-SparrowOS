@@ -464,8 +464,8 @@ public class FileManagerController implements Initializable {
         dirsLabel.setOnMouseClicked(event-> {
             //左键单击
             if (event.getButton() == MouseButton.PRIMARY){
-                refreshPath();
                 CurrentDirCatalog.setCurrentDir((SparrowDirectory)document_i);
+                refreshPath();
                 document_FlowPane.getChildren().clear();
                 showDocumentIcon((SparrowDirectory)document_i);
             }else if (event.getButton()==MouseButton.SECONDARY ){
