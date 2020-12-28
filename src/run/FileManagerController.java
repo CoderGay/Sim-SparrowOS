@@ -188,6 +188,8 @@ public class FileManagerController implements Initializable {
      * 属性面板的控件
      * */
     TextField attribute_TextField = new TextField();
+    ToggleGroup readOnlyGroup = new ToggleGroup();
+
 
     private int newNum = 0; //一个全局变量,添加在文件名后面,用于防止新建文件夹或文件重名
 
@@ -208,8 +210,12 @@ public class FileManagerController implements Initializable {
         newDirsMenuItem.setOnAction(event -> {
             //TODO 创建文件夹应该返回一个在物理层面创建成功的SparrowDirectory √
             MakeDir makeDir = new MakeDir();
+<<<<<<< Updated upstream
             newNum++;
             SparrowDirectory directory = makeDir.mkFile("新建文件夹"+String.valueOf(newNum));
+=======
+            SparrowDirectory directory = makeDir.mkFile(FileTool.getNewName("新建文件夹",true));
+>>>>>>> Stashed changes
             Label label = loadDirsIconLabel(directory);
             document_FlowPane.getChildren().add(label);
             refreshFileTree();
@@ -222,8 +228,12 @@ public class FileManagerController implements Initializable {
             CreateFile createFile = new CreateFile();
             SparrowFile file = null;
             try {
+<<<<<<< Updated upstream
                 newNum++;
                 file = createFile.createFile("新建文件"+String.valueOf(newNum));
+=======
+                file = createFile.createFile(FileTool.getNewName("新建文件",true));
+>>>>>>> Stashed changes
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -522,9 +532,14 @@ public class FileManagerController implements Initializable {
 
             //TODO 把文件粘贴到该目录下 √
             CopyFile copyFile = new CopyFile();
-            clipboard = copyFile.copy(clipboard);
+            Document newDocument = copyFile.copy(clipboard);
+            FileCatalog newDocumentFileCatalog = newDocument.getFileCatalog();
+            String curCatalog = CurrentDirCatalog.getCurrentDir().getFileCatalog().getCatalogName();
+            newDocumentFileCatalog.setCatalogName(curCatalog+FileTool.getNewName(newDocumentFileCatalog.getCatalogName(),false));
+            newDocument.setFileCatalog(newDocumentFileCatalog);
+
             List<Document> data = doc.getData();
-            data.add(clipboard);
+            data.add(newDocument);
             doc.setData(data);
             copyFile.pasteDir2Dir(doc);
             //TODO 把这个文件装进硬盘 √
@@ -597,9 +612,13 @@ public class FileManagerController implements Initializable {
             List<Document> data = currentDir.getData();
             //TODO 接收clipboard.data,返回一个可用的Document(接口的意思)然后才放下去 √
             CopyFile copyFile = new CopyFile();
-            clipboard = copyFile.copy(clipboard);
+            Document newDocument = copyFile.copy(clipboard);
+            FileCatalog newDocumentFileCatalog = newDocument.getFileCatalog();
+            String curCatalog = CurrentDirCatalog.getCurrentDir().getFileCatalog().getCatalogName();
+            newDocumentFileCatalog.setCatalogName(curCatalog+FileTool.getNewName(newDocumentFileCatalog.getCatalogName(),false));
+            newDocument.setFileCatalog(newDocumentFileCatalog);
 
-            data.add(clipboard);
+            data.add(newDocument);
             currentDir.setData(data);
             //TODO 装载回去,即将currentDir写回硬盘 √
             copyFile.pasteDir2Dir(currentDir);
@@ -798,6 +817,25 @@ public class FileManagerController implements Initializable {
         radioButton.setLayoutX(114);
         radioButton.setLayoutY(325);
         radioButton.setText("只读");
+        if(document.getFileCatalog().getFileAttribute()[7]==1){
+            radioButton.setSelected(true);
+        }
+
+        radioButton.setToggleGroup(readOnlyGroup);
+
+        readOnlyGroup.selectedToggleProperty().addListener((ObservableValue<? extends Toggle> ov, Toggle old_toggle,
+                                                            Toggle new_toggle) -> {
+            if (readOnlyGroup.getSelectedToggle() != null) {
+                FileCatalog catalog = document.getFileCatalog();
+                catalog.setFileAttribute(catalog.getFileAttribute()[4]*1000+1);
+                document.setFileCatalog(catalog);
+
+                //TODO 修改只读属性
+                FileTool.renameFile(document);
+            }
+        });
+
+
         if(document.getFileCatalog().getFileAttribute()!=null&&document.getFileCatalog().getFileAttribute()[7]==1){
             radioButton.setSelected(true);
         }
@@ -875,6 +913,7 @@ public class FileManagerController implements Initializable {
     private void setSaveMenuItem(SparrowFile txtFile){
         saveMenuItem.setOnAction(event -> {
             //TODO 保存 √
+<<<<<<< Updated upstream
             if (txtFile.getFileCatalog().getFileAttribute()[7]==1){
                 return;
             }
@@ -891,6 +930,24 @@ public class FileManagerController implements Initializable {
             String fileName = FileTool.getEndFileName(txtFile.getFileCatalog().getCatalogName());
             System.out.println("已保存："+txtFile.getData()+"至"+fileName);
 
+=======
+            if (txtFile.getFileCatalog().getFileAttribute()[7]==1){//该文件为只读文件
+                return;
+            }else{
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(textArea.getText());
+                txtFile.setData(stringBuilder.toString());
+                FileCatalog fileCatalog =txtFile.getFileCatalog();
+                fileCatalog.setFileLength(stringBuilder.toString().length());
+                txtFile.setFileCatalog(fileCatalog);
+                //TODO 保存至硬盘 √
+                WriteFile writeFile = new WriteFile();
+                writeFile.writeFile(txtFile);
+
+                String fileName = FileTool.getEndFileName(txtFile.getFileCatalog().getCatalogName());
+                System.out.println("已保存："+txtFile.getData()+"至"+fileName);
+            }
+>>>>>>> Stashed changes
         });
     }
 

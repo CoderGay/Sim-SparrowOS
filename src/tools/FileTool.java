@@ -14,7 +14,9 @@ import org.junit.Assert;
 
 import javax.print.Doc;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -486,5 +488,24 @@ public class FileTool {
             updateFile((SparrowFile)document);
             Disk.output2DiskDocument(Disk.getDisk());
         }
+    }
+
+    public static String getNewName(String oldName,boolean isNewDoc){
+        StringBuilder newName = new StringBuilder();
+        String[] split = oldName.split("\\.");
+        if (split.length>0)
+        newName.append(split[0]);
+        String dateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        String substring = dateStr.substring(dateStr.length() - 5, dateStr.length());
+        if (isNewDoc){
+            newName.append("(");
+            newName.append(substring);
+            newName.append(")");
+        }else {
+            newName.append("-副本"+substring);
+        }
+        if (split.length>1)
+        newName.append("."+split[1]);
+        return newName.toString();
     }
 }

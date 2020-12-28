@@ -330,6 +330,7 @@ public class Disk implements Serializable,Device{
 
         DiskBlock<Document> block = new DiskBlock<>();
         block.setData(data);
+        block.setOccupiedSize(data.getSize());
         diskBlockList.set(blockIndex,block);
         return true;
     }
