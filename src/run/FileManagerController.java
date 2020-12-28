@@ -210,12 +210,7 @@ public class FileManagerController implements Initializable {
         newDirsMenuItem.setOnAction(event -> {
             //TODO 创建文件夹应该返回一个在物理层面创建成功的SparrowDirectory √
             MakeDir makeDir = new MakeDir();
-<<<<<<< Updated upstream
-            newNum++;
-            SparrowDirectory directory = makeDir.mkFile("新建文件夹"+String.valueOf(newNum));
-=======
             SparrowDirectory directory = makeDir.mkFile(FileTool.getNewName("新建文件夹",true));
->>>>>>> Stashed changes
             Label label = loadDirsIconLabel(directory);
             document_FlowPane.getChildren().add(label);
             refreshFileTree();
@@ -228,12 +223,7 @@ public class FileManagerController implements Initializable {
             CreateFile createFile = new CreateFile();
             SparrowFile file = null;
             try {
-<<<<<<< Updated upstream
-                newNum++;
-                file = createFile.createFile("新建文件"+String.valueOf(newNum));
-=======
                 file = createFile.createFile(FileTool.getNewName("新建文件",true));
->>>>>>> Stashed changes
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -913,24 +903,6 @@ public class FileManagerController implements Initializable {
     private void setSaveMenuItem(SparrowFile txtFile){
         saveMenuItem.setOnAction(event -> {
             //TODO 保存 √
-<<<<<<< Updated upstream
-            if (txtFile.getFileCatalog().getFileAttribute()[7]==1){
-                return;
-            }
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(textArea.getText());
-            txtFile.setData(stringBuilder.toString());
-            FileCatalog fileCatalog =txtFile.getFileCatalog();
-            fileCatalog.setFileLength(stringBuilder.toString().length());
-            txtFile.setFileCatalog(fileCatalog);
-            //TODO 保存至硬盘 √
-            WriteFile writeFile = new WriteFile();
-            writeFile.writeFile(txtFile);
-
-            String fileName = FileTool.getEndFileName(txtFile.getFileCatalog().getCatalogName());
-            System.out.println("已保存："+txtFile.getData()+"至"+fileName);
-
-=======
             if (txtFile.getFileCatalog().getFileAttribute()[7]==1){//该文件为只读文件
                 return;
             }else{
@@ -947,7 +919,6 @@ public class FileManagerController implements Initializable {
                 String fileName = FileTool.getEndFileName(txtFile.getFileCatalog().getCatalogName());
                 System.out.println("已保存："+txtFile.getData()+"至"+fileName);
             }
->>>>>>> Stashed changes
         });
     }
 
