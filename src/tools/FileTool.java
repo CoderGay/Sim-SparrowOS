@@ -481,8 +481,10 @@ public class FileTool {
         //判断是文件还是目录
         if (document.getFileCatalog().getExtensionName()==FileTypeEnum.DIR_LABEL.getCode()){
             updateDocument((SparrowDirectory) document);
+            Disk.output2DiskDocument(Disk.getDisk());
         }else{
             updateFile((SparrowFile)document);
+            Disk.output2DiskDocument(Disk.getDisk());
         }
     }
 }

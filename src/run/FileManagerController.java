@@ -208,6 +208,7 @@ public class FileManagerController implements Initializable {
         newDirsMenuItem.setOnAction(event -> {
             //TODO 创建文件夹应该返回一个在物理层面创建成功的SparrowDirectory √
             MakeDir makeDir = new MakeDir();
+            newNum++;
             SparrowDirectory directory = makeDir.mkFile("新建文件夹"+String.valueOf(newNum));
             Label label = loadDirsIconLabel(directory);
             document_FlowPane.getChildren().add(label);
@@ -221,6 +222,7 @@ public class FileManagerController implements Initializable {
             CreateFile createFile = new CreateFile();
             SparrowFile file = null;
             try {
+                newNum++;
                 file = createFile.createFile("新建文件"+String.valueOf(newNum));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -347,7 +349,7 @@ public class FileManagerController implements Initializable {
 
         rootNode.getChildren().add(loadTreeNode(root));
         //下面直接不放rootNode放loadTreeNode(root)即可
-        fileTree_TreeView.setRoot(rootNode);
+        fileTree_TreeView.setRoot(loadTreeNode(root));
     }
 
     /**
@@ -873,6 +875,9 @@ public class FileManagerController implements Initializable {
     private void setSaveMenuItem(SparrowFile txtFile){
         saveMenuItem.setOnAction(event -> {
             //TODO 保存 √
+            if (txtFile.getFileCatalog().getFileAttribute()[7]==1){
+                return;
+            }
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(textArea.getText());
             txtFile.setData(stringBuilder.toString());
@@ -957,7 +962,7 @@ public class FileManagerController implements Initializable {
         /**
          * 装载列
          * */
-        disk_TableView.getColumns().addAll(numCol,isAvailableCol, occupiedSizeCol,nextIndexCol);
+        disk_TableView.getColumns().addAll(numCol,isAvailableCol,nextIndexCol);
     }
 
     /**

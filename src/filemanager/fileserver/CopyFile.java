@@ -88,8 +88,8 @@ public class CopyFile implements FileServer {
             attribute+=i;
             attribute*=10;
         }
-
-        FileCatalog fileCatalog = new FileCatalog(FileTool.getEndFileName(document.getFileCatalog().getCatalogName()),
+        //TODO 粘贴的文件名字
+        FileCatalog fileCatalog = new FileCatalog(FileTool.getEndFileName(document.getFileCatalog().getCatalogName()+(System.currentTimeMillis()%10000/1000)),
                 document.getFileCatalog().getExtensionName(),
                 attribute,
                 startIndex,
