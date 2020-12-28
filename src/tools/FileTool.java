@@ -350,22 +350,7 @@ public class FileTool {
     }
 
     public static void pasteDir2Directory(SparrowDirectory sparrowDirectory){
-        //添加到父目录的结点中
-        SparrowDirectory fatherDirectory = CurrentDirCatalog.getCurrentDir();
-        List<Document>documents = fatherDirectory.getData();
-        //进行覆盖
-        for (int i = 0; i < documents.size(); i++) {
-            if (documents.get(i).getFileCatalog().getCatalogName() == sparrowDirectory.getFileCatalog().getCatalogName()){
-                if (documents.get(i).getFileCatalog().getExtensionName()==FileTypeEnum.DIR_LABEL.getCode()){
-                    deleteDirFromDir((SparrowDirectory)documents.get(i));
-                    addDir2Directory(sparrowDirectory);
-                    System.out.println("粘贴成功！");
-                    return;
-                }
-                break;
-            }
-        }
-        System.out.println("粘贴失败！");
+
     }
 
     //从文件夹中删除文件

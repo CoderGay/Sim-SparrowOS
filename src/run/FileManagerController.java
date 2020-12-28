@@ -518,14 +518,14 @@ public class FileManagerController implements Initializable {
                 return;
             }
 
-            //TODO 把文件粘贴到该目录下 
+            //TODO 把文件粘贴到该目录下 √
             CopyFile copyFile = new CopyFile();
+            clipboard = copyFile.copy(clipboard);
             List<Document> data = doc.getData();
             data.add(clipboard);
             doc.setData(data);
             copyFile.pasteDir2Dir(doc);
-            //TODO 把这个文件装进硬盘
-
+            //TODO 把这个文件装进硬盘 √
             System.out.println(clipboard.toString()+"完成粘贴");
             refreshFileTree();
             refreshDiskBlockTable();
@@ -593,11 +593,15 @@ public class FileManagerController implements Initializable {
             }
             SparrowDirectory currentDir = CurrentDirCatalog.getCurrentDir();
             List<Document> data = currentDir.getData();
-            //TODO 接收clipboard.data,返回一个可用的Document(接口的意思)然后才放下去
+            //TODO 接收clipboard.data,返回一个可用的Document(接口的意思)然后才放下去 √
+            CopyFile copyFile = new CopyFile();
+            clipboard = copyFile.copy(clipboard);
 
             data.add(clipboard);
             currentDir.setData(data);
             //TODO 装载回去,即将currentDir写回硬盘 √
+            copyFile.pasteDir2Dir(currentDir);
+
             System.out.println(clipboard+"粘贴成功");
             refreshFlowPaneDisplay();
             refreshDiskBlockTable();
