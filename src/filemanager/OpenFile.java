@@ -32,10 +32,6 @@ public class OpenFile {
     }
 
     public boolean openAFile(SparrowFile sparrowFile,int operationType){
-        /**
-        String []dirs = fileName.split("\\\\");
-        FileCatalog fileCatalog = FileTool.getExistFile(fileName);
-         **/
         FileCatalog fileCatalog = sparrowFile.getFileCatalog();
         int[] operate = new int[4];
         for (int i=3;i>=0;i--){

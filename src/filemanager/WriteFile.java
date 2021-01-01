@@ -16,14 +16,9 @@ public class WriteFile {
         FileCatalog fileCatalog = sparrowFile.getFileCatalog();
         OpenFile openFile = OpenFile.getInstance();
         //用写的方式进行打开
-        if (openFile.openAFile(sparrowFile, 0100)){
-            //表示打开成功
-            Disk.getDisk().fileRecycling(sparrowFile.getFileCatalog());
-            Disk.getDisk().writeFile2Disk(sparrowFile);
-            Disk.output2DiskDocument(Disk.getDisk());
-        }
+        Disk.getDisk().fileRecycling(sparrowFile.getFileCatalog());
+        Disk.getDisk().writeFile2Disk(sparrowFile);
+        Disk disk = Disk.getDisk();
+        Disk.output2DiskDocument(Disk.getDisk());
     }
-
-
-
 }

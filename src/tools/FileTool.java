@@ -199,11 +199,11 @@ public class FileTool {
     public static List<SparrowFile> decomposeFile(SparrowFile file){
         //分解内容超过64B的文件
         List<SparrowFile> resultFiles = new ArrayList<>();
-        if (file.getSize()< SizeEnum.BLOCKS_SIZE.getCode()){
-            System.out.println("[分解失败]:无需分解,该文件大小仅为"+file.getSize()+"B!");
+        if (file.getFileCatalog().getFileLength()< SizeEnum.BLOCKS_SIZE.getCode()){
+            System.out.println("[分解失败]:无需分解,该文件大小仅为"+file.getFileCatalog().getFileLength()+"B!");
             return null;
         }
-        int divided = file.getSize()/SizeEnum.BLOCKS_SIZE.getCode();
+        int divided = file.getFileCatalog().getFileLength()/SizeEnum.BLOCKS_SIZE.getCode();
         int strStartIndex = 0;
         String allData  = file.getData();
         for (int i = 0; i < divided; i++) {
@@ -214,7 +214,7 @@ public class FileTool {
             resultFiles.add(apartFile);
             strStartIndex+=SizeEnum.BLOCKS_SIZE.getCode();
         }
-        if (file.getSize()% SizeEnum.BLOCKS_SIZE.getCode()!=0){
+        if (file.getFileCatalog().getFileLength()% SizeEnum.BLOCKS_SIZE.getCode()!=0){
             SparrowFile apartFile = new SparrowFile();
             apartFile.setFileCatalog(file.getFileCatalog());
             apartFile.setSize(SizeEnum.BLOCKS_SIZE.getCode());

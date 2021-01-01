@@ -234,16 +234,14 @@ public class Disk implements Serializable,Device{
             int newIndex = 0;
             for (int i = 1; i <blockFileList.size(); i++) {
                 writeDisk(blockIndex, blockFileList.get(i));
-                //如果比文件原来的大则申请盘块空间;
                 newIndex = Disk.getDisk().getFirstAvailableBlock();
-                //System.out.println("newIndex : "+ newIndex);
                 fileAllocateTable[blockIndex] = newIndex;
                 fileAllocateTable[newIndex] = SizeEnum.END_BLOCKS_LABEL.getCode();
                 blockIndex = newIndex;
             }
             //fileAllocateTable[blockIndex] = SizeEnum.END_BLOCKS_LABEL.getCode();
         }
-
+        output2DiskDocument(disk);
         return false;
     }
 
