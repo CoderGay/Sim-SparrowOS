@@ -952,7 +952,7 @@ public class FileManagerController implements Initializable {
         numCol.setCellValueFactory(
                 new PropertyValueFactory<>("num"));
 
-        TableColumn isAvailableCol = new TableColumn("是否可用");
+        TableColumn isAvailableCol = new TableColumn("是否损坏");
         isAvailableCol.setMinWidth(50);
         isAvailableCol.setCellValueFactory(
                 new PropertyValueFactory<>("isAvailable"));
@@ -978,7 +978,7 @@ public class FileManagerController implements Initializable {
         int[] fileAllocateTable = disk.getFileAllocateTable();
         List<DiskBlock> diskBlockList = disk.getDiskBlockList();
         for(int i=0;i<diskBlockList.size();i++){
-            DiskBlockVO diskBlockVO = new DiskBlockVO(i+1,diskBlockList.get(i).isAvailable(),diskBlockList.get(i).getOccupiedSize(),fileAllocateTable[i]);
+            DiskBlockVO diskBlockVO = new DiskBlockVO(i,diskBlockList.get(i).isAvailable(),diskBlockList.get(i).getOccupiedSize(),fileAllocateTable[i]);
             targetData.add(diskBlockVO);
         }
 
@@ -990,7 +990,7 @@ public class FileManagerController implements Initializable {
         /**
          * 装载列
          * */
-        disk_TableView.getColumns().addAll(numCol,isAvailableCol,nextIndexCol);
+        disk_TableView.getColumns().addAll(numCol,isAvailableCol,occupiedSizeCol,nextIndexCol);
     }
 
     /**
